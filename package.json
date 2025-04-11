@@ -1,0 +1,35 @@
+{
+  "name": "bloggeroo-api",
+  "version": "1.0.0",
+  "description": "https://www.theodinproject.com/lessons/node-path-nodejs-blog-api",
+  "main": "app.mjs",
+  "scripts": {
+    "dev": "node --watch app.mjs",
+    "start": "node app.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rubicon2/bloggeroo-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rubicon2/bloggeroo-api/issues"
+  },
+  "homepage": "https://github.com/rubicon2/bloggeroo-api#readme",
+  "devDependencies": {
+    "@eslint/css": "^0.6.0",
+    "@eslint/js": "^9.24.0",
+    "@eslint/json": "^0.11.0",
+    "@eslint/markdown": "^6.3.0",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
