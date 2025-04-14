@@ -35,4 +35,17 @@ function createResetPasswordChain() {
   return [password(), confirmPassword()];
 }
 
-export { email, password, createSignUpChain, createResetPasswordChain };
+function createLogInChain() {
+  return [
+    email(),
+    body('password').notEmpty().withMessage('Password is required'),
+  ];
+}
+
+export {
+  email,
+  password,
+  createSignUpChain,
+  createResetPasswordChain,
+  createLogInChain,
+};

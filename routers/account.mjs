@@ -5,7 +5,7 @@ import { Router } from 'express';
 
 const app = Router();
 
-// app.post('/log-in', controller.postLogIn);
+app.post('/log-in', validators.createLogInChain(), controller.postLogIn);
 // app.post('/log-out', controller.postLogOut);
 app.post('/sign-up', validators.createSignUpChain(), controller.postSignUp);
 app.post(

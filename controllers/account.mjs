@@ -8,12 +8,59 @@ import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-function postLogIn(req, res, next) {
-  // Something to do with passport, I guess?
-  // Send an access and a refresh token to the client.
-  return res.json({
-    message: 'Log in posted, wow!',
-  });
+async function postLogIn(req, res, next) {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    // Will probably want to format this more nicely for client consumption.
+    return res.status(400).json({ errors: result.array() });
+  }
+
+  try {
+    // Something to do with passport, I guess? << Actually, no. Not this time.
+    const user = await db.user.findUnique({
+      where: {
+        email: req.body.email,
+      },
+    });
+
+    if (!user)
+      return res.status(400).json({
+        message: 'Incorrect email or password.',
+      });
+
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if (match) {
+      // Should refresh and access tokens have the same payload? Or not?
+      // No - if permissions change then they will be updated for the user
+      // when they get a new access token. The refresh token shouldn't have
+      // any data on it that is likely to change, like permissions, etc.
+      const refresh = jwt.sign({ email: user.email }, process.env.SECRET, {
+        expiresIn: '28d',
+      });
+      const access = jwt.sign(
+        {
+          email: user.email,
+          isAdmin: user.isAdmin,
+          isBanned: user.isBanned,
+        },
+        process.env.SECRET,
+        {
+          expiresIn: '15m',
+        },
+      );
+      // Client will store the refresh and access tokens however they like. Not the server's business.
+      return res.status(200).json({
+        refresh,
+        access,
+      });
+    } else {
+      return res.status(400).json({
+        message: 'Incorrect email or password.',
+      });
+    }
+  } catch (error) {
+    return next(error);
+  }
 }
 
 function postLogOut(req, res, next) {
