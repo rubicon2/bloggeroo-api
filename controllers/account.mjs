@@ -163,6 +163,5 @@ export {
   postSignUp,
   postConfirmEmail,
   postPasswordResetRequest,
-  getPasswordReset,
   postPasswordReset,
 };
