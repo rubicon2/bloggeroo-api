@@ -83,7 +83,8 @@ async function postConfirmEmail(req, res, next) {
     await db.revokedToken.create({
       data: {
         token: req.token,
-        expiresAt: new Date(req.tokenData.exp),
+        // jwt exp is in seconds, dates are in millis, so need to convert
+        expiresAt: new Date(req.tokenData.exp * 1000),
       },
     });
     return res.status(201).json({
