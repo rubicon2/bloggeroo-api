@@ -97,13 +97,65 @@ async function postConfirmEmail(req, res, next) {
   }
 }
 
-function postPasswordResetRequest(req, res, next) {}
-
-function getPasswordReset(req, res, next) {
-  // Redirect to postPasswordReset, basically.
+function postPasswordResetRequest(req, res, next) {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    // Will probably want to format this more nicely for client consumption.
+    return res.status(400).json({ errors: result.array() });
+  }
+  // Send email with link to reset password.
+  const token = jwt.sign(
+    {
+      email: req.body.email,
+    },
+    process.env.SECRET,
+    { expiresIn: '30m' },
+  );
+  // Let's pretend this token is emailed to the user here,
+  // proving the user has access to that email address.
+  // When nodemailer/smtp service starts working, woweee.
+  return res.status(200).json({
+    message:
+      'An email has been sent with a link to reset your password. The link will expire in 30 minutes.',
+    token,
+  });
 }
 
-function postPasswordReset(req, res, next) {}
+async function postPasswordReset(req, res, next) {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    // Will probably want to format this more nicely for client consumption.
+    return res.status(400).json({ errors: result.array() });
+  }
+  // Actually reset password (client will have a page with form, etc.)
+  try {
+    const hash = await bcrypt.hash(req.body.password, 10);
+    const user = await db.user.update({
+      where: {
+        email: req.tokenData.email,
+      },
+      data: {
+        password: hash,
+      },
+    });
+
+    // Add token to blacklist so it cannot be used again.
+    await db.revokedToken.create({
+      data: {
+        token: req.token,
+        expiresAt: new Date(req.tokenData.exp * 1000),
+      },
+    });
+    return res.status(200).json({
+      message: 'User password has been updated',
+      email: user.email,
+      isAdmin: user.isAdmin,
+      isBanner: user.isBanned,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
 
 export {
   postLogIn,

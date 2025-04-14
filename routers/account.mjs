@@ -14,7 +14,17 @@ app.post(
   token.verifyToken,
   controller.postConfirmEmail,
 );
-// app.post('/request-password-reset', controller.postPasswordResetRequest);
-// app.post('/password-reset', controller.postPasswordReset);
+app.post(
+  '/request-password-reset',
+  validators.email(),
+  controller.postPasswordResetRequest,
+);
+app.post(
+  '/password-reset',
+  validators.createResetPasswordChain(),
+  token.getQueryToken,
+  token.verifyToken,
+  controller.postPasswordReset,
+);
 
 export default app;
