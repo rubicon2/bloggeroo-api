@@ -9,6 +9,15 @@ app.use(express.json());
 
 app.use('/account', accountRouter);
 
+app.use((error, req, res, next) => {
+  console.log(error);
+  return res.status(500).json({
+    message: 'An error has occurred',
+    error: error.message,
+    stack: error.stack,
+  });
+});
+
 app.listen(process.env.PORT, () =>
   console.log('Listening on port', process.env.PORT),
 );
