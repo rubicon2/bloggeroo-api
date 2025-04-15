@@ -1,5 +1,5 @@
 import accountRouter from './routers/account.mjs';
-
+import db from './db/prismaClient.mjs';
 import express from 'express';
 import 'dotenv/config';
 
@@ -21,3 +21,19 @@ app.use((error, req, res, next) => {
 app.listen(process.env.PORT, () =>
   console.log('Listening on port', process.env.PORT),
 );
+
+// Every so often, clear any revoked tokens that have expired anyway.
+setInterval(async () => {
+  try {
+    const { count } = await db.revokedToken.deleteMany({
+      where: {
+        expiresAt: {
+          lt: new Date(Date.now()),
+        },
+      },
+    });
+    if (count) console.log(`Cleared ${count} revoked tokens from db table`);
+  } catch (error) {
+    console.error(error);
+  }
+}, process.env.CLEAR_DB_TOKENS_INTERVAL);
