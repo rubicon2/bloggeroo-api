@@ -26,5 +26,17 @@ app.post(
   token.verifyToken,
   controller.postPasswordReset,
 );
+app.post(
+  '/request-close-account',
+  token.getHeaderToken,
+  token.verifyToken,
+  controller.postCloseAccountRequest,
+);
+app.delete(
+  '/',
+  token.getQueryToken,
+  token.verifyToken,
+  controller.deleteAccount,
+);
 
 export default app;

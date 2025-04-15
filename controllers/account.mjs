@@ -204,6 +204,51 @@ async function postPasswordReset(req, res, next) {
   }
 }
 
+function postCloseAccountRequest(req, res, next) {
+  const token = jwt.sign(
+    {
+      email: req.tokenData.email,
+    },
+    process.env.SECRET,
+    { expiresIn: '5m' },
+  );
+  // Pretend to email the token woah.
+  return res.status(200).json({
+    message:
+      'An email has been sent with a link to delete your account. The link will expire in 30 minutes.',
+    token,
+  });
+}
+
+async function deleteAccount(req, res, next) {
+  try {
+    const user = await db.user.delete({
+      where: {
+        email: req.tokenData.email,
+      },
+    });
+
+    await db.revokedToken.create({
+      data: {
+        token: req.token,
+        expiresAt: new Date(req.tokenData.exp * 1000),
+      },
+    });
+
+    // It would be good if we could revoke any refresh tokens that relate to this user.
+    // Maybe if we store the header token and query token both on the req object?
+    return res.status(200).json({
+      message: 'User successfully deleted',
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 export {
   postLogIn,
   postLogOut,
@@ -211,4 +256,6 @@ export {
   postConfirmEmail,
   postPasswordResetRequest,
   postPasswordReset,
+  postCloseAccountRequest,
+  deleteAccount,
 };

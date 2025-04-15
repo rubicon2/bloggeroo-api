@@ -2,6 +2,15 @@ import db from '../db/prismaClient.mjs';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
+function getHeaderToken(req, res, next) {
+  const bearerHeader = req.headers['authorization'];
+  if (bearerHeader) {
+    const jwt = bearerHeader.split(' ')[1];
+    req.token = jwt;
+  }
+  return next();
+}
+
 function getQueryToken(req, res, next) {
   if (req.query.token) req.token = req.query.token;
   return next();
@@ -35,4 +44,4 @@ function verifyToken(req, res, next) {
   });
 }
 
-export { getQueryToken, verifyToken };
+export { getHeaderToken, getQueryToken, verifyToken };
