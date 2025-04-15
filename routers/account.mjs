@@ -6,7 +6,12 @@ import { Router } from 'express';
 const app = Router();
 
 app.post('/log-in', validators.createLogInChain(), controller.postLogIn);
-// app.post('/log-out', controller.postLogOut);
+app.post(
+  '/log-out',
+  token.getHeaderToken,
+  token.verifyToken,
+  controller.postLogOut,
+);
 app.post('/sign-up', validators.createSignUpChain(), controller.postSignUp);
 app.post(
   '/confirm-email',

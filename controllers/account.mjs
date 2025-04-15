@@ -2,6 +2,8 @@ import db from '../db/prismaClient.mjs';
 import {
   sendSignUpConfirmEmail,
   sendAttemptedSignUpEmail,
+  sendPasswordResetEmail,
+  sendAccountDeleteEmail,
 } from '../mailer/nodemailer.mjs';
 
 import { validationResult } from 'express-validator';
@@ -63,52 +65,66 @@ async function postLogIn(req, res, next) {
   }
 }
 
-function postLogOut(req, res, next) {
-  // Clear the user token from the header?
+async function postLogOut(req, res, next) {
+  // Tokens should be cleared by client on their side.
+  // All we need to do here is add the tokens to the blacklist.
+  await db.revokedToken.create({
+    data: {
+      token: req.token,
+      // jwt exp is in seconds, dates are in millis, so need to convert
+      expiresAt: new Date(req.tokenData.exp * 1000),
+    },
+  });
+  return res.status(200).json({
+    message: 'Successfully logged out',
+  });
 }
 
 async function postSignUp(req, res, next) {
-  const result = validationResult(req);
-  if (!result.isEmpty()) {
-    // Will probably want to format this more nicely for client consumption.
-    return res.status(400).json({ errors: result.array() });
-  }
-  // If no errors...
-  const { email, password } = req.body;
-  const existingUser = await db.user.findUnique({
-    where: {
-      email,
-    },
-  });
-
-  if (existingUser) {
-    // If email is already in use, send an email telling the user someone tried to use their email to sign up.
-    // await sendAttemptedSignUpEmail(email);
-  } else {
-    // If email not in use, send email with token to confirm email.
-    const hash = await bcrypt.hash(password, 10);
-    const token = jwt.sign(
-      {
+  try {
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      // Will probably want to format this more nicely for client consumption.
+      return res.status(400).json({ errors: result.array() });
+    }
+    // If no errors...
+    const { email, password } = req.body;
+    const existingUser = await db.user.findUnique({
+      where: {
         email,
-        hash,
       },
-      process.env.SECRET,
-      { expiresIn: '30m' },
-    );
-    // Send email to user's email address, containing link with token.
-    // await sendSignUpConfirmEmail(email, token);
-    // For now return token and see if we can use that to complete sign up with a post.
+    });
+
+    if (existingUser) {
+      // If email is already in use, send an email telling the user someone tried to use their email to sign up.
+      await sendAttemptedSignUpEmail(email);
+    } else {
+      // If email not in use, send email with token to confirm email.
+      const hash = await bcrypt.hash(password, 10);
+      const token = jwt.sign(
+        {
+          email,
+          hash,
+        },
+        process.env.SECRET,
+        { expiresIn: '30m' },
+      );
+      // Send email to user's email address, containing link with token.
+      await sendSignUpConfirmEmail(email, token);
+      // For now return token and see if we can use that to complete sign up with a post.
+      return res.status(200).json({
+        message:
+          'Please confirm your email address to complete the sign up process.',
+      });
+    }
+
     return res.status(200).json({
       message:
         'Please confirm your email address to complete the sign up process.',
-      token,
     });
+  } catch (error) {
+    return next(error);
   }
-
-  return res.status(200).json({
-    message:
-      'Please confirm your email address to complete the sign up process.',
-  });
 }
 
 async function postConfirmEmail(req, res, next) {
@@ -144,38 +160,40 @@ async function postConfirmEmail(req, res, next) {
   }
 }
 
-function postPasswordResetRequest(req, res, next) {
-  const result = validationResult(req);
-  if (!result.isEmpty()) {
-    // Will probably want to format this more nicely for client consumption.
-    return res.status(400).json({ errors: result.array() });
+async function postPasswordResetRequest(req, res, next) {
+  try {
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      // Will probably want to format this more nicely for client consumption.
+      return res.status(400).json({ errors: result.array() });
+    }
+    // Send email with link to reset password.
+    const token = jwt.sign(
+      {
+        email: req.body.email,
+      },
+      process.env.SECRET,
+      { expiresIn: '30m' },
+    );
+    await sendPasswordResetEmail(req.body.email, token);
+    return res.status(200).json({
+      message:
+        'An email has been sent with a link to reset your password. The link will expire in 30 minutes.',
+    });
+  } catch (error) {
+    return next(error);
   }
-  // Send email with link to reset password.
-  const token = jwt.sign(
-    {
-      email: req.body.email,
-    },
-    process.env.SECRET,
-    { expiresIn: '30m' },
-  );
-  // Let's pretend this token is emailed to the user here,
-  // proving the user has access to that email address.
-  // When nodemailer/smtp service starts working, woweee.
-  return res.status(200).json({
-    message:
-      'An email has been sent with a link to reset your password. The link will expire in 30 minutes.',
-    token,
-  });
 }
 
 async function postPasswordReset(req, res, next) {
-  const result = validationResult(req);
-  if (!result.isEmpty()) {
-    // Will probably want to format this more nicely for client consumption.
-    return res.status(400).json({ errors: result.array() });
-  }
-  // Actually reset password (client will have a page with form, etc.)
   try {
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+      // Will probably want to format this more nicely for client consumption.
+      return res.status(400).json({ errors: result.array() });
+    }
+    // Actually reset password (client will have a page with form, etc.)
+
     const hash = await bcrypt.hash(req.body.password, 10);
     const user = await db.user.update({
       where: {
@@ -204,20 +222,23 @@ async function postPasswordReset(req, res, next) {
   }
 }
 
-function postCloseAccountRequest(req, res, next) {
-  const token = jwt.sign(
-    {
-      email: req.tokenData.email,
-    },
-    process.env.SECRET,
-    { expiresIn: '5m' },
-  );
-  // Pretend to email the token woah.
-  return res.status(200).json({
-    message:
-      'An email has been sent with a link to delete your account. The link will expire in 30 minutes.',
-    token,
-  });
+async function postCloseAccountRequest(req, res, next) {
+  try {
+    const token = jwt.sign(
+      {
+        email: req.tokenData.email,
+      },
+      process.env.SECRET,
+      { expiresIn: '30m' },
+    );
+    await sendAccountDeleteEmail(req.tokenData.email, token);
+    return res.status(200).json({
+      message:
+        'An email has been sent with a link to delete your account. The link will expire in 30 minutes.',
+    });
+  } catch (error) {
+    return next(error);
+  }
 }
 
 async function deleteAccount(req, res, next) {
