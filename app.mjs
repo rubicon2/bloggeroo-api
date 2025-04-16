@@ -1,3 +1,4 @@
+import authRouter from './routers/auth.mjs';
 import accountRouter from './routers/account.mjs';
 import db from './db/prismaClient.mjs';
 import express from 'express';
@@ -7,6 +8,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(authRouter);
 app.use('/account', accountRouter);
 
 app.use((error, req, res, next) => {
