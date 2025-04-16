@@ -36,7 +36,9 @@ async function postLogIn(req, res, next) {
       // No - if permissions change then they will be updated for the user
       // when they get a new access token. The refresh token shouldn't have
       // any data on it that is likely to change, like permissions, etc.
-      const refresh = jwt.sign({ email: user.email }, process.env.SECRET, {
+      // User id on refresh token - when refresh is used, id is used to get user
+      // from db, and new access token will be generated.
+      const refresh = jwt.sign({ id: user.id }, process.env.SECRET, {
         expiresIn: '28d',
       });
       const access = jwt.sign(
@@ -50,9 +52,11 @@ async function postLogIn(req, res, next) {
           expiresIn: '15m',
         },
       );
-      // Client will store the refresh and access tokens however they like. Not the server's business.
+      // Refresh token is stored in the response header.
+      // Would be more convenient if this was plopped in a httpOnly cookie, wouldn't it?
+      res.setHeader('Authorization', 'Bearer ' + refresh);
+      // Client will store the access token however they like. Not the server's business.
       return res.status(200).json({
-        refresh,
         access,
       });
     } else {
