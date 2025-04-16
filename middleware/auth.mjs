@@ -36,7 +36,4 @@ function isAdmin(req, res, next) {
     return next(new Error('You need to be an admin to access this resource'));
 }
 
-// How to check if admin or owner of resource? Errrrr. A middleware for this would be great,
-// but how to check owner of resource without getting it from the db first? Impossible.
-
 export { getUser, isAuth, isAdmin };
