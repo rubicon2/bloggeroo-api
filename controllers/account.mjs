@@ -32,6 +32,11 @@ async function postLogIn(req, res, next) {
 
     const match = await bcrypt.compare(req.body.password, user.password);
     if (match) {
+      // Do not let user log in if they have been banned.
+      if (user.isBanned)
+        return res.status(403).json({
+          message: 'User is banned.',
+        });
       // Should refresh and access tokens have the same payload? Or not?
       // No - if permissions change then they will be updated for the user
       // when they get a new access token. The refresh token shouldn't have
