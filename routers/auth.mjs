@@ -8,8 +8,8 @@ const app = Router();
 app.post(
   '/refresh',
   token.getHeaderToken,
-  token.verifyToken,
-  auth.getUser,
+  token.verifyToken({ showErrors: true }),
+  auth.getUser({ showErrors: true }),
   auth.isAuth,
   controller.postRefresh,
 );
@@ -17,8 +17,8 @@ app.post(
 app.post(
   '/access',
   token.getHeaderToken,
-  token.verifyToken,
-  auth.getUser,
+  token.verifyToken({ showErrors: true }),
+  auth.getUser({ showErrors: true }),
   auth.isAuth,
   controller.postAccess,
 );
