@@ -25,7 +25,7 @@ app.post(
   controller.postPasswordResetRequest,
 );
 app.post(
-  '/password-reset',
+  '/reset-password',
   validators.createResetPasswordChain(),
   token.getQueryToken,
   token.verifyToken,
