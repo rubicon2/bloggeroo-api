@@ -8,7 +8,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use(authRouter);
+app.use('/auth', authRouter);
 app.use('/account', accountRouter);
 
 app.use((error, req, res, next) => {
