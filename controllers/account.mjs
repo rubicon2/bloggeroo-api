@@ -43,7 +43,7 @@ async function postLogIn(req, res, next) {
       // any data on it that is likely to change, like permissions, etc.
       // User id on refresh token - when refresh is used, id is used to get user
       // from db, and new access token will be generated.
-      const refresh = jwt.sign({ id: user.id }, process.env.SECRET, {
+      const refresh = jwt.sign({ email: user.email }, process.env.SECRET, {
         expiresIn: '28d',
       });
       const access = jwt.sign(
