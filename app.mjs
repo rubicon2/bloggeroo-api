@@ -12,7 +12,10 @@ app.use('/auth', authRouter);
 app.use('/account', accountRouter);
 
 app.use((error, req, res, next) => {
-  console.log(error);
+  // Remember - errors should return a status code and message to the client.
+  // Try to use this only as a last resort. Other more specific responses
+  // (e.g. 400, 401, 403) should be provided by other routes.
+  console.error(error);
   return res.status(500).json({
     message: 'An error has occurred',
     error: error.message,
