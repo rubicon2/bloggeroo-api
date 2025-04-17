@@ -21,7 +21,12 @@ function getUser(options = { showErrors: false }) {
       req.user = user;
       return next();
     } catch (error) {
-      if (options.showErrors) return next(error);
+      if (options.showErrors) {
+        return res.status(400).json({
+          status: 400,
+          message: error.message,
+        });
+      }
       // Move onto the next middleware with no req.user set.
       else return next();
     }
@@ -30,14 +35,22 @@ function getUser(options = { showErrors: false }) {
 
 function isAuth(req, res, next) {
   if (req.user) return next();
-  else
-    return next(new Error('You need to be logged in to access this resource'));
+  else {
+    return res.status(401).json({
+      status: 401,
+      message: 'You need to be logged in to access this resource',
+    });
+  }
 }
 
 function isAdmin(req, res, next) {
   if (req.user?.isAdmin) return next();
-  else
-    return next(new Error('You need to be an admin to access this resource'));
+  else {
+    return res.status(403).json({
+      status: 403,
+      message: 'You need to be logged in as an admin to access this resource',
+    });
+  }
 }
 
 export { getUser, isAuth, isAdmin };

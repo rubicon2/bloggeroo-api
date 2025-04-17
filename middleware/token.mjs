@@ -43,7 +43,12 @@ function verifyToken(options = { showErrors: false }) {
         req.tokenData = decoded;
         return next();
       } catch (error) {
-        if (options.showErrors) return next(error);
+        if (options.showErrors) {
+          return res.status(400).json({
+            status: 400,
+            error,
+          });
+        }
         // Move onto next middleware with no req.token, or req.tokenData set.
         else return next();
       }
