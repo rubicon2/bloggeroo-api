@@ -162,7 +162,7 @@ async function postConfirmEmail(req, res, next) {
     return res.status(201).json({
       email: user.email,
       isAdmin: user.isAdmin,
-      isBanner: user.isBanned,
+      isBanned: user.isBanned,
     });
   } catch (error) {
     return next(error);
