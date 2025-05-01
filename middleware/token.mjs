@@ -22,11 +22,11 @@ function getQueryToken(req, res, next) {
 function verifyToken(options = { showErrors: false }) {
   return (req, res, next) => {
     // Make sure token contained req.token has not been tampered with.
-    jwt.verify(req.token, process.env.SECRET, async (error, decoded) => {
+    jwt.verify(req.token, process.env.SECRET, async (jwtError, decoded) => {
       try {
-        if (error) {
+        if (jwtError) {
           delete req.token;
-          throw error;
+          throw new Error(jwtError);
         }
 
         // Check token is not on the revoked list on the db, i.e. has already been used.
@@ -46,7 +46,9 @@ function verifyToken(options = { showErrors: false }) {
         if (options.showErrors) {
           return res.status(400).json({
             status: 400,
-            error,
+            // For some reason, just sending the error doesn't work (it sends an empty object),
+            // but error.message works fine ???
+            error: error.message,
           });
         }
         // Move onto next middleware with no req.token, or req.tokenData set.

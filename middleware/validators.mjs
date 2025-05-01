@@ -28,7 +28,12 @@ function confirmPassword() {
 }
 
 function createSignUpChain() {
-  return [email(), password(), confirmPassword()];
+  return [
+    email(),
+    body('name').notEmpty().withMessage('Name is required'),
+    password(),
+    confirmPassword(),
+  ];
 }
 
 function createResetPasswordChain() {

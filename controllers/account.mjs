@@ -97,7 +97,7 @@ async function postSignUp(req, res, next) {
       return res.status(400).json({ errors: result.array() });
     }
     // If no errors...
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     const existingUser = await db.user.findUnique({
       where: {
         email,
@@ -114,6 +114,7 @@ async function postSignUp(req, res, next) {
         {
           email,
           hash,
+          name,
         },
         process.env.SECRET,
         { expiresIn: '30m' },
@@ -149,6 +150,7 @@ async function postConfirmEmail(req, res, next) {
       data: {
         email: req.tokenData.email,
         password: req.tokenData.hash,
+        name: req.tokenData.name,
       },
     });
     // Add token to blacklist so it cannot be used again.
@@ -161,6 +163,7 @@ async function postConfirmEmail(req, res, next) {
     });
     return res.status(201).json({
       email: user.email,
+      name: user.name,
       isAdmin: user.isAdmin,
       isBanned: user.isBanned,
     });
