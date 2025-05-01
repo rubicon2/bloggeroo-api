@@ -21,6 +21,7 @@ model User {
   updatedAt DateTime  @updatedAt
   email     String    @unique
   password  String
+  name      String
   isAdmin   Boolean   @default(false)
   isBanned  Boolean   @default(false)
   blogs     Blog[]
