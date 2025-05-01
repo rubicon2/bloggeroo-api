@@ -1,5 +1,6 @@
 import authRouter from './routers/auth.mjs';
 import accountRouter from './routers/account.mjs';
+import blogsRouter from './routers/blogs.mjs';
 import db from './db/prismaClient.mjs';
 import express from 'express';
 import 'dotenv/config';
@@ -10,6 +11,7 @@ app.use(express.json());
 
 app.use('/auth', authRouter);
 app.use('/account', accountRouter);
+app.use('/blogs', blogsRouter);
 
 app.use((error, req, res, next) => {
   // Remember - errors should return a status code and message to the client.

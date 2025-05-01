@@ -42,10 +42,21 @@ function createLogInChain() {
   ];
 }
 
+function createBlogChain() {
+  return [
+    body('title').notEmpty().withMessage('A title is required'),
+    body('publishedAt')
+      .optional()
+      .custom((value) => !isNaN(Date.parse(value)))
+      .withMessage('Published at is not a valid date'),
+  ];
+}
+
 export {
   email,
   password,
   createSignUpChain,
   createResetPasswordChain,
   createLogInChain,
+  createBlogChain,
 };
