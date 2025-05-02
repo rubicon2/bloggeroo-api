@@ -6,4 +6,13 @@ const blogsQueryFormatter = {
   toDate: formatters.groupWhere('publishedAt', 'lte', processors.date),
 };
 
-export { blogsQueryFormatter };
+const commentsQueryFormatter = {
+  blogId: formatters.where(),
+  ownerId: formatters.where(),
+  parentCommentId: formatters.where(),
+  text: formatters.where('contains', { mode: 'insensitive' }),
+  fromDate: formatters.groupWhere('createdAt', 'gte', processors.date),
+  toDate: formatters.groupWhere('createdAt', 'lte', processors.date),
+};
+
+export { blogsQueryFormatter, commentsQueryFormatter };
