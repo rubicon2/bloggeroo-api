@@ -115,6 +115,45 @@ async function putComment(req, res, next) {
   }
 }
 
-async function deleteComment(req, res, next) {}
+async function deleteComment(req, res, next) {
+  try {
+    const comment = await db.comment.findUnique({
+      where: {
+        id: req.params.commentId,
+      },
+    });
+
+    if (!comment) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Comment does not exist',
+      });
+    }
+
+    // Delete that comment, only if user is admin or owner of comment.
+    if (req.user.id !== comment.ownerId && !req.user.isAdmin) {
+      return res.status(403).json({
+        status: 403,
+        message: 'You are not authorized to delete this comment',
+      });
+    }
+
+    await db.comment.delete({
+      where: {
+        id: comment.id,
+      },
+    });
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Comment successfully deleted',
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
+  }
+}
 
 export { getComments, postComment, putComment, deleteComment };

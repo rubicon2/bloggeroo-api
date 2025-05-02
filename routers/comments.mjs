@@ -32,5 +32,13 @@ app.put(
   body('text').notEmpty().withMessage('Comment requires text'),
   controller.putComment,
 );
+app.delete(
+  '/:commentId',
+  token.getQueryToken,
+  token.verifyToken(),
+  auth.getUser(),
+  auth.isAuth,
+  controller.deleteComment,
+);
 
 export default app;
