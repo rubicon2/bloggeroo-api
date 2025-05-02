@@ -43,7 +43,7 @@ async function postBlog(req, res, next) {
         ownerId: req.user.id,
         title,
         body: body || '',
-        publishedAt: new Date(publishedAt),
+        publishedAt: publishedAt ? new Date(publishedAt) : null,
       },
     });
     return res.status(201).json({
