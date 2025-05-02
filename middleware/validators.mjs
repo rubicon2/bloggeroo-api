@@ -1,4 +1,5 @@
-import { body } from 'express-validator';
+import db from '../db/prismaClient.mjs';
+import { body, query } from 'express-validator';
 
 function email() {
   return body('email')
@@ -57,6 +58,25 @@ function createBlogChain() {
   ];
 }
 
+function createCommentChain() {
+  return [
+    query('blogId')
+      .notEmpty()
+      .withMessage('Comment requires a blogId')
+      .custom(async (id) => {
+        // Check blog exists. If this finds nothing it will throw an error.
+        const blog = await db.blog.findUnique({
+          where: {
+            id,
+          },
+        });
+        if (!blog) throw new Error('Blog does not exist');
+      })
+      .withMessage('Blog does not exist'),
+    body('text').notEmpty().withMessage('Comment requires text'),
+  ];
+}
+
 export {
   email,
   password,
@@ -64,4 +84,5 @@ export {
   createResetPasswordChain,
   createLogInChain,
   createBlogChain,
+  createCommentChain,
 };

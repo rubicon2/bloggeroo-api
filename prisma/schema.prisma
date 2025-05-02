@@ -48,7 +48,7 @@ model Comment {
   text            String
   replies         Comment[] @relation("replies")
   parentCommentId String?
-  parentComment   Comment?  @relation("replies", fields: [parentCommentId], references: [id])
+  parentComment   Comment?  @relation("replies", fields: [parentCommentId], references: [id], onDelete: Cascade)
   ownerId         String
   owner           User      @relation(fields: [ownerId], references: [id])
   blogId          String
