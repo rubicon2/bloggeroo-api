@@ -11,8 +11,8 @@ const app = Router();
 app.get(
   '/',
   token.getQueryToken,
-  token.verifyToken({ showErrors: true }),
-  auth.getUser({ showErrors: true }),
+  token.verifyToken(),
+  auth.getUser(),
   urlQueryToPrisma('query', blogsQueryFormatter),
   controller.getBlogs,
 );
