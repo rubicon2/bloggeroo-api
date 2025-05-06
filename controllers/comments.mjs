@@ -29,6 +29,33 @@ async function getComments(req, res, next) {
   }
 }
 
+async function getComment(req, res, next) {
+  try {
+    const comment = await db.comment.findUnique({
+      where: {
+        id: req.params.commentId,
+      },
+    });
+
+    if (!comment) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Comment not found',
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      comment,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
+  }
+}
+
 async function postComment(req, res, next) {
   try {
     const result = validationResult(req);
@@ -156,4 +183,4 @@ async function deleteComment(req, res, next) {
   }
 }
 
-export { getComments, postComment, putComment, deleteComment };
+export { getComments, getComment, postComment, putComment, deleteComment };

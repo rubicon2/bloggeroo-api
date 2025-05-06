@@ -14,6 +14,7 @@ app.get(
   urlQueryToPrisma('query', commentsQueryFormatter),
   controller.getComments,
 );
+app.get('/:commentId', controller.getComment);
 app.post(
   '/',
   token.getQueryToken,
