@@ -5,6 +5,7 @@ import {
   sendPasswordResetEmail,
   sendAccountDeleteEmail,
 } from '../mailer/nodemailer.mjs';
+import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
@@ -13,8 +14,12 @@ import jwt from 'jsonwebtoken';
 async function postLogIn(req, res, next) {
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    // Will probably want to format this more nicely for client consumption.
-    return res.status(400).json({ errors: result.array() });
+    return res.status(400).json({
+      status: 'fail',
+      data: {
+        validationErrors: formatValidationErrors(result.array()),
+      },
+    });
   }
 
   try {
@@ -27,7 +32,10 @@ async function postLogIn(req, res, next) {
 
     if (!user)
       return res.status(400).json({
-        message: 'Incorrect email or password.',
+        status: 'fail',
+        data: {
+          message: 'Incorrect email or password.',
+        },
       });
 
     const match = await bcrypt.compare(req.body.password, user.password);
@@ -35,7 +43,10 @@ async function postLogIn(req, res, next) {
       // Do not let user log in if they have been banned.
       if (user.isBanned)
         return res.status(403).json({
-          message: 'User is banned.',
+          status: 'fail',
+          data: {
+            message: 'User is banned.',
+          },
         });
       // Should refresh and access tokens have the same payload? Or not?
       // No - if permissions change then they will be updated for the user
@@ -57,16 +68,24 @@ async function postLogIn(req, res, next) {
           expiresIn: '15m',
         },
       );
+
       // Refresh token is stored in the response header.
       // Would be more convenient if this was plopped in a httpOnly cookie, wouldn't it?
       res.setHeader('Authorization', 'Bearer ' + refresh);
+
       // Client will store the access token however they like. Not the server's business.
       return res.status(200).json({
-        access,
+        status: 'success',
+        data: {
+          access,
+        },
       });
     } else {
       return res.status(400).json({
-        message: 'Incorrect email or password.',
+        status: 'fail',
+        data: {
+          message: 'Incorrect email or password.',
+        },
       });
     }
   } catch (error) {
@@ -85,7 +104,8 @@ async function postLogOut(req, res, next) {
     },
   });
   return res.status(200).json({
-    message: 'Successfully logged out',
+    status: 'success',
+    data: null,
   });
 }
 
@@ -93,9 +113,14 @@ async function postSignUp(req, res, next) {
   try {
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      // Will probably want to format this more nicely for client consumption.
-      return res.status(400).json({ errors: result.array() });
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          validationErrors: formatValidationErrors(result.array()),
+        },
+      });
     }
+
     // If no errors...
     const { email, password, name } = req.body;
     const existingUser = await db.user.findUnique({
@@ -123,14 +148,20 @@ async function postSignUp(req, res, next) {
       await sendSignUpConfirmEmail(email, token);
       // For now return token and see if we can use that to complete sign up with a post.
       return res.status(200).json({
-        message:
-          'Please confirm your email address to complete the sign up process.',
+        status: 'success',
+        data: {
+          message:
+            'Please confirm your email address to complete the sign up process.',
+        },
       });
     }
 
     return res.status(200).json({
-      message:
-        'Please confirm your email address to complete the sign up process.',
+      status: 'success',
+      data: {
+        message:
+          'Please confirm your email address to complete the sign up process.',
+      },
     });
   } catch (error) {
     return next(error);
@@ -153,6 +184,7 @@ async function postConfirmEmail(req, res, next) {
         name: req.tokenData.name,
       },
     });
+
     // Add token to blacklist so it cannot be used again.
     await db.revokedToken.create({
       data: {
@@ -161,11 +193,17 @@ async function postConfirmEmail(req, res, next) {
         expiresAt: new Date(req.tokenData.exp * 1000),
       },
     });
+
     return res.status(201).json({
-      email: user.email,
-      name: user.name,
-      isAdmin: user.isAdmin,
-      isBanned: user.isBanned,
+      status: 'success',
+      data: {
+        user: {
+          email: user.email,
+          name: user.name,
+          isAdmin: user.isAdmin,
+          isBanned: user.isBanned,
+        },
+      },
     });
   } catch (error) {
     return next(error);
@@ -176,9 +214,14 @@ async function postPasswordResetRequest(req, res, next) {
   try {
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      // Will probably want to format this more nicely for client consumption.
-      return res.status(400).json({ errors: result.array() });
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          validationErrors: formatValidationErrors(result.array()),
+        },
+      });
     }
+
     // Send email with link to reset password.
     const token = jwt.sign(
       {
@@ -188,9 +231,13 @@ async function postPasswordResetRequest(req, res, next) {
       { expiresIn: '30m' },
     );
     await sendPasswordResetEmail(req.body.email, token);
+
     return res.status(200).json({
-      message:
-        'An email has been sent with a link to reset your password. The link will expire in 30 minutes.',
+      status: 'success',
+      data: {
+        message:
+          'An email has been sent with a link to reset your password. The link will expire in 30 minutes.',
+      },
     });
   } catch (error) {
     return next(error);
@@ -201,11 +248,15 @@ async function postPasswordReset(req, res, next) {
   try {
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      // Will probably want to format this more nicely for client consumption.
-      return res.status(400).json({ errors: result.array() });
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          validationErrors: formatValidationErrors(result.array()),
+        },
+      });
     }
-    // Actually reset password (client will have a page with form, etc.)
 
+    // Actually reset password (client will have a page with form, etc.)
     const hash = await bcrypt.hash(req.body.password, 10);
     const user = await db.user.update({
       where: {
@@ -223,11 +274,12 @@ async function postPasswordReset(req, res, next) {
         expiresAt: new Date(req.tokenData.exp * 1000),
       },
     });
+
     return res.status(200).json({
-      message: 'User password has been updated',
-      email: user.email,
-      isAdmin: user.isAdmin,
-      isBanner: user.isBanned,
+      status: 'success',
+      data: {
+        message: 'Password has been updated',
+      },
     });
   } catch (error) {
     return next(error);
@@ -244,9 +296,13 @@ async function postCloseAccountRequest(req, res, next) {
       { expiresIn: '30m' },
     );
     await sendAccountDeleteEmail(req.tokenData.email, token);
+
     return res.status(200).json({
-      message:
-        'An email has been sent with a link to delete your account. The link will expire in 30 minutes.',
+      status: 'success',
+      data: {
+        message:
+          'An email has been sent with a link to delete your account. The link will expire in 30 minutes.',
+      },
     });
   } catch (error) {
     return next(error);
@@ -271,10 +327,13 @@ async function deleteAccount(req, res, next) {
     // It would be good if we could revoke any refresh tokens that relate to this user.
     // Maybe if we store the header token and query token both on the req object?
     return res.status(200).json({
-      message: 'User successfully deleted',
-      user: {
-        id: user.id,
-        email: user.email,
+      status: 'success',
+      data: {
+        message: 'User successfully deleted',
+        user: {
+          id: user.id,
+          email: user.email,
+        },
       },
     });
   } catch (error) {

@@ -23,8 +23,10 @@ function getUser(options = { showErrors: false }) {
     } catch (error) {
       if (options.showErrors) {
         return res.status(400).json({
-          status: 400,
-          message: error.message,
+          status: 'fail',
+          data: {
+            message: error.message,
+          },
         });
       }
       // Move onto the next middleware with no req.user set.
@@ -37,16 +39,20 @@ function isAuth(req, res, next) {
   if (req.user) {
     if (req.user.isBanned) {
       return res.status(403).json({
-        status: 403,
-        message: 'You are banned and not allowed to access this resource',
+        status: 'fail',
+        data: {
+          message: 'You are banned and not allowed to access this resource',
+        },
       });
     }
     // If user is logged in and not banned.
     return next();
   } else {
     return res.status(401).json({
-      status: 401,
-      message: 'You need to be logged in to access this resource',
+      status: 'fail',
+      data: {
+        message: 'You need to be logged in to access this resource',
+      },
     });
   }
 }
@@ -55,8 +61,10 @@ function isAdmin(req, res, next) {
   if (req.user?.isAdmin) return next();
   else {
     return res.status(403).json({
-      status: 403,
-      message: 'You need to be logged in as an admin to access this resource',
+      status: 'fail',
+      data: {
+        message: 'You need to be logged in as an admin to access this resource',
+      },
     });
   }
 }

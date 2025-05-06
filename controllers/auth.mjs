@@ -42,8 +42,10 @@ async function postRefresh(req, res, next) {
 
     res.setHeader('Authorization', 'Bearer ' + refresh);
     return res.status(200).json({
-      message: 'Refresh token set in authorization header',
-      access,
+      status: 'success',
+      data: {
+        access,
+      },
     });
   } catch (error) {
     return next(error);
@@ -62,7 +64,10 @@ function postAccess(req, res, next) {
     { expiresIn: '15m' },
   );
   return res.status(200).json({
-    access: token,
+    status: 'success',
+    data: {
+      access: token,
+    },
   });
 }
 

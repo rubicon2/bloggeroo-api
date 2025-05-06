@@ -45,10 +45,10 @@ function verifyToken(options = { showErrors: false }) {
       } catch (error) {
         if (options.showErrors) {
           return res.status(400).json({
-            status: 400,
-            // For some reason, just sending the error doesn't work (it sends an empty object),
-            // but error.message works fine ???
-            error: error.message,
+            status: 'fail',
+            data: {
+              message: error.message,
+            },
           });
         }
         // Move onto next middleware with no req.token, or req.tokenData set.
