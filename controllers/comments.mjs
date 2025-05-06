@@ -18,14 +18,13 @@ async function getComments(req, res, next) {
   try {
     const comments = await db.comment.findMany(req.prismaQueryParams);
     return res.status(200).json({
-      status: 200,
-      comments,
+      status: 'success',
+      data: {
+        comments,
+      },
     });
   } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      error: error.message,
-    });
+    return next(error);
   }
 }
 
@@ -39,20 +38,21 @@ async function getComment(req, res, next) {
 
     if (!comment) {
       return res.status(404).json({
-        status: 404,
-        error: 'Comment not found',
+        status: 'fail',
+        data: {
+          message: 'Comment not found',
+        },
       });
     }
 
     return res.status(200).json({
-      status: 200,
-      comment,
+      status: 'success',
+      data: {
+        comment,
+      },
     });
   } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      error: error.message,
-    });
+    return next(error);
   }
 }
 
@@ -61,8 +61,10 @@ async function postComment(req, res, next) {
     const result = validationResult(req);
     if (!result.isEmpty()) {
       return res.status(403).json({
-        status: 403,
-        errors: result.array(),
+        status: 'fail',
+        data: {
+          validationErrors: result.array(),
+        },
       });
     }
 
@@ -76,15 +78,13 @@ async function postComment(req, res, next) {
     });
 
     return res.status(201).json({
-      status: 201,
-      message: 'Comment successfully created',
-      comment,
+      status: 'success',
+      data: {
+        comment,
+      },
     });
   } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      error: error.message,
-    });
+    return next(error);
   }
 }
 
@@ -93,8 +93,10 @@ async function putComment(req, res, next) {
     const result = validationResult(req);
     if (!result.isEmpty()) {
       return res.status(403).json({
-        status: 403,
-        errors: result.array(),
+        status: 'fail',
+        data: {
+          validationErrors: result.array(),
+        },
       });
     }
 
@@ -106,8 +108,10 @@ async function putComment(req, res, next) {
 
     if (!comment) {
       return res.status(400).json({
-        status: 400,
-        message: 'Comment does not exist',
+        status: 'fail',
+        data: {
+          message: 'Comment does not exist',
+        },
       });
     }
 
@@ -123,22 +127,22 @@ async function putComment(req, res, next) {
       });
 
       return res.status(200).json({
-        status: 200,
-        message: 'Comment successfully updated',
-        comment: updated,
+        status: 'success',
+        data: {
+          comment: updated,
+        },
       });
     }
 
     // If user is not authorised to update, tell them why.
     return res.status(403).json({
-      status: 403,
-      message: 'You are not authorised to update this resource',
+      status: 'fail',
+      data: {
+        message: 'You are not authorised to update this resource',
+      },
     });
   } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      error: error.message,
-    });
+    return next(error);
   }
 }
 
@@ -152,16 +156,20 @@ async function deleteComment(req, res, next) {
 
     if (!comment) {
       return res.status(400).json({
-        status: 400,
-        message: 'Comment does not exist',
+        status: 'fail',
+        data: {
+          message: 'Comment does not exist',
+        },
       });
     }
 
     // Delete that comment, only if user is admin or owner of comment.
     if (req.user.id !== comment.ownerId && !req.user.isAdmin) {
       return res.status(403).json({
-        status: 403,
-        message: 'You are not authorized to delete this comment',
+        status: 'fail',
+        data: {
+          message: 'You are not authorized to delete this comment',
+        },
       });
     }
 
@@ -172,14 +180,11 @@ async function deleteComment(req, res, next) {
     });
 
     return res.status(200).json({
-      status: 200,
-      message: 'Comment successfully deleted',
+      status: 'success',
+      data: null,
     });
   } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      error: error.message,
-    });
+    return next(error);
   }
 }
 
