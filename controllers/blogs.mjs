@@ -74,6 +74,15 @@ async function putBlog(req, res, next) {
       },
     });
 
+    if (!blog) {
+      return res.status(404).json({
+        status: 'fail',
+        data: {
+          message: 'Blog not found',
+        },
+      });
+    }
+
     if (req.user.id !== blog.ownerId && !req.user.isAdmin) {
       return res.status(403).json({
         status: 403,
