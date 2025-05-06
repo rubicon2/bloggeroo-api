@@ -54,7 +54,9 @@ function createBlogChain() {
     body('publishedAt')
       .optional()
       .custom((value) => !isNaN(Date.parse(value)))
-      .withMessage('Published at is not a valid date'),
+      .withMessage('Published at is not a valid date')
+      // Turn the date string from the form/query into an actual date object.
+      .customSanitizer((value) => new Date(value)),
   ];
 }
 
