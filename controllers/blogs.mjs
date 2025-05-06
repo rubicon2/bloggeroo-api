@@ -18,8 +18,10 @@ async function getBlogs(req, res, next) {
     const blogs = await db.blog.findMany(req.prismaQueryParams);
 
     return res.status(200).json({
-      status: 200,
-      blogs,
+      status: 'success',
+      data: {
+        blogs,
+      },
     });
   } catch (error) {
     return next(error);
@@ -30,9 +32,10 @@ async function postBlog(req, res, next) {
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(400).json({
-      status: 400,
-      message: 'Form could not be submitted',
-      errors: result.array(),
+      status: 'fail',
+      data: {
+        validationErrors: result.array(),
+      },
     });
   }
 
@@ -47,9 +50,10 @@ async function postBlog(req, res, next) {
       },
     });
     return res.status(201).json({
-      status: 201,
-      message: 'Blog successfully created',
-      blog,
+      status: 'success',
+      data: {
+        blog,
+      },
     });
   } catch (error) {
     return next(error);
@@ -85,8 +89,10 @@ async function putBlog(req, res, next) {
 
     if (req.user.id !== blog.ownerId && !req.user.isAdmin) {
       return res.status(403).json({
-        status: 403,
-        message: 'You are not authorized to update this blog',
+        status: 'fail',
+        data: {
+          message: 'You are not authorized to update this blog',
+        },
       });
     }
 
@@ -100,9 +106,10 @@ async function putBlog(req, res, next) {
     });
 
     return res.status(200).json({
-      status: 200,
-      message: 'Blog successfully updated',
-      blog: updated,
+      status: 'success',
+      data: {
+        blog: updated,
+      },
     });
   } catch (error) {
     return next(error);
@@ -121,8 +128,10 @@ async function getBlog(req, res, next) {
 
     if (!blog) {
       return res.status(404).json({
-        status: 404,
-        error: 'Blog not found',
+        status: 'fail',
+        data: {
+          message: 'Blog not found',
+        },
       });
     }
 
@@ -130,14 +139,18 @@ async function getBlog(req, res, next) {
     // Only give access if user is admin, or owner, or it is published.
     if (!blog.publishedAt && !user?.isAdmin && user?.id !== blog.ownerId) {
       return res.status(403).json({
-        status: 403,
-        message: 'You do not have access to this blog.',
+        status: 'fail',
+        data: {
+          message: 'You do not have access to this blog',
+        },
       });
     }
 
     return res.status(200).json({
-      status: 200,
-      blog,
+      status: 'success',
+      data: {
+        blog,
+      },
     });
   } catch (error) {
     return next(error);
@@ -154,15 +167,19 @@ async function deleteBlog(req, res, next) {
 
     if (!blog) {
       return res.status(400).json({
-        status: 400,
-        message: 'Blog does not exist',
+        status: 'fail',
+        data: {
+          message: 'Blog does not exist',
+        },
       });
     }
 
     if (req.user.id !== blog.ownerId && !req.user.isAdmin) {
       return res.status(403).json({
-        status: 403,
-        message: 'You are not authorized to delete this blog',
+        status: 'fail',
+        data: {
+          message: 'You are not authorized to delete this blog',
+        },
       });
     }
 
@@ -173,8 +190,8 @@ async function deleteBlog(req, res, next) {
     });
 
     return res.status(200).json({
-      status: 200,
-      message: 'Blog successfully deleted',
+      status: 'success',
+      data: null,
     });
   } catch (error) {
     return next(error);
