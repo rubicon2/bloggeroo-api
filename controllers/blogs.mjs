@@ -57,6 +57,16 @@ async function postBlog(req, res, next) {
 }
 
 async function putBlog(req, res, next) {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    return res.status(400).json({
+      status: 'fail',
+      data: {
+        validationErrors: result.array(),
+      },
+    });
+  }
+
   try {
     const blog = await db.blog.findUnique({
       where: {
