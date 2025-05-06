@@ -100,6 +100,13 @@ async function getBlog(req, res, next) {
       // Not possible at the moment because I declined to include name on User table. Whoops...
     });
 
+    if (!blog) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Blog not found',
+      });
+    }
+
     const { user } = req;
     // Only give access if user is admin, or owner, or it is published.
     if (!blog.publishedAt && !user?.isAdmin && user?.id !== blog.ownerId) {
