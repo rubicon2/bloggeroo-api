@@ -21,9 +21,8 @@ app.use((error, req, res, next) => {
   // (e.g. 400, 401, 403) should be provided by other routes.
   console.error(error);
   return res.status(500).json({
-    message: 'An error has occurred',
-    error: error.message,
-    stack: error.stack,
+    status: 'error',
+    message: error.message,
   });
 });
 
