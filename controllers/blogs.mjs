@@ -1,4 +1,5 @@
 import db from '../db/prismaClient.mjs';
+import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 import { validationResult } from 'express-validator';
 
 async function getBlogs(req, res, next) {
@@ -34,7 +35,7 @@ async function postBlog(req, res, next) {
     return res.status(400).json({
       status: 'fail',
       data: {
-        validationErrors: result.array(),
+        validationErrors: formatValidationErrors(result.array()),
       },
     });
   }
@@ -66,7 +67,7 @@ async function putBlog(req, res, next) {
     return res.status(400).json({
       status: 'fail',
       data: {
-        validationErrors: result.array(),
+        validationErrors: formatValidationErrors(result.array()),
       },
     });
   }

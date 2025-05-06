@@ -1,4 +1,5 @@
 import db from '../db/prismaClient.mjs';
+import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 import { validationResult } from 'express-validator';
 
 // Should comments be nested within blogs or not?
@@ -63,7 +64,7 @@ async function postComment(req, res, next) {
       return res.status(403).json({
         status: 'fail',
         data: {
-          validationErrors: result.array(),
+          validationErrors: formatValidationErrors(result.array()),
         },
       });
     }
@@ -95,7 +96,7 @@ async function putComment(req, res, next) {
       return res.status(403).json({
         status: 'fail',
         data: {
-          validationErrors: result.array(),
+          validationErrors: formatValidationErrors(result.array()),
         },
       });
     }
