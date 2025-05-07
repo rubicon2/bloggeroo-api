@@ -4,11 +4,27 @@ import blogsRouter from './routers/blogs.mjs';
 import commentsRouter from './routers/comments.mjs';
 import db from './db/prismaClient.mjs';
 import express from 'express';
+import cors from 'cors';
 import 'dotenv/config';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+const whitelist = Array.from(
+  process.env.CORS_WHITELIST.split(',').map((str) => str.trim()),
+);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  }),
+);
 
 app.use('/auth', authRouter);
 app.use('/account', accountRouter);
