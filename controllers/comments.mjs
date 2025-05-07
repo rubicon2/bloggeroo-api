@@ -17,7 +17,19 @@ import { validationResult } from 'express-validator';
 async function getComments(req, res, next) {
   // How to format replies and such? A tree structure? Or just a chronological list of comments?
   try {
-    const comments = await db.comment.findMany(req.prismaQueryParams);
+    const comments = await db.comment.findMany({
+      ...req.prismaQueryParams,
+      include: {
+        owner: {
+          select: {
+            name: true,
+            isAdmin: true,
+            isBanned: true,
+          },
+        },
+      },
+    });
+
     return res.status(200).json({
       status: 'success',
       data: {
@@ -34,6 +46,15 @@ async function getComment(req, res, next) {
     const comment = await db.comment.findUnique({
       where: {
         id: req.params.commentId,
+      },
+      include: {
+        owner: {
+          select: {
+            name: true,
+            isAdmin: true,
+            isBanned: true,
+          },
+        },
       },
     });
 

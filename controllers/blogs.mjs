@@ -16,7 +16,18 @@ async function getBlogs(req, res, next) {
       };
     }
 
-    const blogs = await db.blog.findMany(req.prismaQueryParams);
+    const blogs = await db.blog.findMany({
+      ...req.prismaQueryParams,
+      include: {
+        owner: {
+          select: {
+            name: true,
+            isAdmin: true,
+            isBanned: true,
+          },
+        },
+      },
+    });
 
     return res.status(200).json({
       status: 'success',
@@ -123,8 +134,15 @@ async function getBlog(req, res, next) {
       where: {
         id: req.params.blogId,
       },
-      // Include name of author.
-      // Not possible at the moment because I declined to include name on User table. Whoops...
+      include: {
+        owner: {
+          select: {
+            name: true,
+            isAdmin: true,
+            isBanned: true,
+          },
+        },
+      },
     });
 
     if (!blog) {
