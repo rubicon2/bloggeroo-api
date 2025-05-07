@@ -94,7 +94,7 @@ async function postLogIn(req, res, next) {
   }
 }
 
-async function postLogOut(req, res, next) {
+async function postLogOut(req, res) {
   // Tokens should be cleared by client on their side.
   // All we need to do here is add the tokens to the blacklist.
   await db.revokedToken.create({
@@ -259,7 +259,7 @@ async function postPasswordReset(req, res, next) {
 
     // Actually reset password (client will have a page with form, etc.)
     const hash = await bcrypt.hash(req.body.password, 10);
-    const user = await db.user.update({
+    await db.user.update({
       where: {
         email: req.tokenData.email,
       },
