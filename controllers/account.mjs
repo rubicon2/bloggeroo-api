@@ -23,7 +23,6 @@ async function postLogIn(req, res, next) {
   }
 
   try {
-    // Something to do with passport, I guess? << Actually, no. Not this time.
     const user = await db.user.findUnique({
       where: {
         email: req.body.email,
@@ -48,15 +47,17 @@ async function postLogIn(req, res, next) {
             message: 'User is banned.',
           },
         });
+
       // Should refresh and access tokens have the same payload? Or not?
       // No - if permissions change then they will be updated for the user
       // when they get a new access token. The refresh token shouldn't have
       // any data on it that is likely to change, like permissions, etc.
-      // User id on refresh token - when refresh is used, id is used to get user
-      // from db, and new access token will be generated.
+      // User email on refresh token - when refresh is used, email is used
+      // to get user from db, and new access token will be generated.
       const refresh = jwt.sign({ email: user.email }, process.env.SECRET, {
         expiresIn: '28d',
       });
+
       const access = jwt.sign(
         {
           email: user.email,
