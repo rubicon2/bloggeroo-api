@@ -15,4 +15,16 @@ const commentsQueryFormatter = {
   toDate: formatters.groupWhere('createdAt', 'lte', processors.date),
 };
 
-export { blogsQueryFormatter, commentsQueryFormatter };
+const usersQueryFormatter = {
+  userId: formatters.where(),
+  email: formatters.where('contains', { mode: 'insensitive' }),
+  name: formatters.where('contains', { mode: 'insensitive' }),
+  isAdmin: formatters.where('contains', { mode: 'insensitive' }),
+  isBanned: formatters.where('contains', { mode: 'insensitive' }),
+  fromCreatedDate: formatters.groupWhere('createdAt', 'gte', processors.date),
+  toCreatedDate: formatters.groupWhere('createdAt', 'lte', processors.date),
+  fromUpdatedDate: formatters.groupWhere('updatedAt', 'gte', processors.date),
+  toUpdatedDate: formatters.groupWhere('updatedAt', 'lte', processors.date),
+};
+
+export { blogsQueryFormatter, commentsQueryFormatter, usersQueryFormatter };

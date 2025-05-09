@@ -79,6 +79,25 @@ function createCommentChain() {
   ];
 }
 
+function createUserChain() {
+  return [
+    body('name').trim().notEmpty().withMessage('A name is required'),
+    email(),
+    // If checkbox is on, the value will be on. If the checkbox is off, nothing will be sent at all.
+    // Turn this into a boolean value suitable for prisma to use.
+    body('isAdmin').customSanitizer((value) => {
+      return value ? true : false;
+    }),
+    body('isBanned').customSanitizer((value) => {
+      return value ? true : false;
+    }),
+  ];
+}
+
+function createNewUserChain() {
+  return [createUserChain(), password(), confirmPassword()];
+}
+
 export {
   email,
   password,
@@ -87,4 +106,6 @@ export {
   createLogInChain,
   createBlogChain,
   createCommentChain,
+  createUserChain,
+  createNewUserChain,
 };
