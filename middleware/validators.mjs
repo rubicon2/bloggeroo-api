@@ -48,6 +48,29 @@ function createLogInChain() {
   ];
 }
 
+function createAdminLogInChain() {
+  return [
+    email().custom(async (value) => {
+      const user = await db.user.findUnique({
+        where: {
+          email: value,
+        },
+      });
+
+      if (!user) {
+        // Lie about the user not existing, so bad actors can't
+        // put in lists of emails to figure out who has an account.
+        throw new Error('Incorrect username or password');
+      }
+
+      if (!user.isAdmin) {
+        throw new Error('User is not an admin');
+      }
+    }),
+    body('password').notEmpty().withMessage('Password is required'),
+  ];
+}
+
 function createBlogChain() {
   return [
     body('title').notEmpty().withMessage('A title is required'),
@@ -104,6 +127,7 @@ export {
   createSignUpChain,
   createResetPasswordChain,
   createLogInChain,
+  createAdminLogInChain,
   createBlogChain,
   createCommentChain,
   createUserChain,
