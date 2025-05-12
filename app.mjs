@@ -3,6 +3,7 @@ import accountRouter from './routers/account.mjs';
 import blogsRouter from './routers/blogs.mjs';
 import commentsRouter from './routers/comments.mjs';
 import usersRouter from './routers/users.mjs';
+import adminRouter from './routers/admin/admin.mjs';
 import db from './db/prismaClient.mjs';
 import express from 'express';
 import cors from 'cors';
@@ -32,6 +33,7 @@ app.use('/account', accountRouter);
 app.use('/blogs', blogsRouter);
 app.use('/comments', commentsRouter);
 app.use('/users', usersRouter);
+app.use('/admin', adminRouter);
 
 app.use((error, req, res, next) => {
   // Remember - errors should return a status code and message to the client.

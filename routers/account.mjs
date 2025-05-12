@@ -9,7 +9,7 @@ app.post('/log-in', validators.createLogInChain(), controller.postLogIn);
 app.post(
   '/log-out',
   token.getHeaderToken,
-  token.verifyToken(),
+  token.verifyToken({ showErrors: true }),
   controller.postLogOut,
 );
 app.post('/sign-up', validators.createSignUpChain(), controller.postSignUp);

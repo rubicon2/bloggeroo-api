@@ -2,20 +2,40 @@ import db from '../db/prismaClient.mjs';
 import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 import { validationResult } from 'express-validator';
 
-async function getBlogs(req, res, next) {
+async function getPublishedBlogs(req, res, next) {
   try {
-    // Should this get all blogs if admin, even unpublished ones? Or not?
-    // Yes it should. If the admin doesn't want to see them, that can be filtered clientside.
-    // If user is not admin, filter out unpublished blogs, as a non-admin should not be able to get that data.
-    if (!req.user?.isAdmin) {
-      req.prismaQueryParams.where = {
-        ...req.prismaQueryParams?.where,
+    const blogs = await db.blog.findMany({
+      ...req.prismaQueryParams,
+      where: {
+        ...req.prismaQueryParams.where,
         publishedAt: {
           not: null,
         },
-      };
-    }
+      },
+      include: {
+        owner: {
+          select: {
+            name: true,
+            isAdmin: true,
+            isBanned: true,
+          },
+        },
+      },
+    });
 
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        blogs,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getAllBlogs(req, res, next) {
+  try {
     const blogs = await db.blog.findMany({
       ...req.prismaQueryParams,
       include: {
@@ -217,4 +237,11 @@ async function deleteBlog(req, res, next) {
   }
 }
 
-export { getBlogs, postBlog, putBlog, getBlog, deleteBlog };
+export {
+  getPublishedBlogs,
+  getAllBlogs,
+  postBlog,
+  putBlog,
+  getBlog,
+  deleteBlog,
+};

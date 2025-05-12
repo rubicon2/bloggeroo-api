@@ -14,7 +14,9 @@ app.get(
   urlQueryToPrisma('query', commentsQueryFormatter),
   controller.getComments,
 );
+
 app.get('/:commentId', controller.getComment);
+
 app.post(
   '/',
   token.getQueryToken,
@@ -24,6 +26,7 @@ app.post(
   validateComment(),
   controller.postComment,
 );
+
 app.put(
   '/:commentId',
   token.getQueryToken,
@@ -33,6 +36,7 @@ app.put(
   body('text').notEmpty().withMessage('Comment requires text'),
   controller.putComment,
 );
+
 app.delete(
   '/:commentId',
   token.getQueryToken,

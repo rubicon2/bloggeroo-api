@@ -69,4 +69,38 @@ function isAdmin(req, res, next) {
   }
 }
 
-export { getUser, isAuth, isAdmin };
+async function isAdminLoggingIn(req, res, next) {
+  // This should run before the log in is attempted - so only admins can log in to admin client.
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        email: req.body.email,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          message: 'That user does not exist',
+        },
+      });
+    }
+
+    if (!user.isAdmin) {
+      return res.status(403).json({
+        status: 'fail',
+        data: {
+          message: 'That user is not an admin',
+        },
+      });
+    }
+
+    // If user exists and is an admin, progress to the actual log in route.
+    next();
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export { getUser, isAuth, isAdmin, isAdminLoggingIn };
