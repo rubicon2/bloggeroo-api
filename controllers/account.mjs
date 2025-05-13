@@ -70,9 +70,16 @@ async function postLogIn(req, res, next) {
         },
       );
 
-      // Refresh token is stored in the response header.
-      // Would be more convenient if this was plopped in a httpOnly cookie, wouldn't it?
-      res.setHeader('Authorization', 'Bearer ' + refresh);
+      // Refresh token is stored in a secure httpOnly, secure, sameSite strict cookie.
+      // This should prevent CSRF (cross-site request forgery) attacks, where an auth cookie
+      // is sent automatically along with API requests initiated from other sites.
+      res.cookie('refresh', refresh, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        // Expire in 28 days just like the refresh token.
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 28),
+      });
 
       // Client will store the access token however they like. Not the server's business.
       return res.status(200).json({
