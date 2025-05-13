@@ -39,7 +39,7 @@ app.post(
 );
 app.delete(
   '/',
-  token.getQueryToken,
+  token.getHeaderToken,
   token.verifyToken({ showErrors: true }),
   controller.deleteAccount,
 );

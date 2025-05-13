@@ -19,7 +19,7 @@ app.get('/:commentId', controller.getComment);
 
 app.post(
   '/',
-  token.getQueryToken,
+  token.getHeaderToken,
   token.verifyToken(),
   auth.getUser(),
   auth.isAuth,
@@ -29,7 +29,7 @@ app.post(
 
 app.put(
   '/:commentId',
-  token.getQueryToken,
+  token.getHeaderToken,
   token.verifyToken(),
   auth.getUser(),
   auth.isAuth,
@@ -39,7 +39,7 @@ app.put(
 
 app.delete(
   '/:commentId',
-  token.getQueryToken,
+  token.getHeaderToken,
   token.verifyToken(),
   auth.getUser(),
   auth.isAuth,

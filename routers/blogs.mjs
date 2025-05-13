@@ -10,7 +10,7 @@ const app = Router();
 
 app.get(
   '/',
-  token.getQueryToken,
+  token.getHeaderToken,
   token.verifyToken(),
   auth.getUser(),
   urlQueryToPrisma('query', blogsQueryFormatter),
@@ -19,7 +19,7 @@ app.get(
 
 app.get(
   '/:blogId',
-  token.getQueryToken,
+  token.getHeaderToken,
   token.verifyToken(),
   auth.getUser(),
   controller.getBlog,
