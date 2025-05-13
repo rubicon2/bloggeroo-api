@@ -7,7 +7,7 @@ const app = Router();
 
 app.post(
   '/access',
-  token.getHeaderToken,
+  token.getCookieToken('refresh'),
   token.verifyToken({ showErrors: true }),
   auth.getUser({ showErrors: true }),
   auth.isAuth,

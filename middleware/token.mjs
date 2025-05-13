@@ -11,6 +11,29 @@ function getHeaderToken(req, res, next) {
   return next();
 }
 
+function getCookieToken(cookieName) {
+  return (req, res, next) => {
+    const cookie = req.headers.cookie;
+    if (cookie) {
+      const cookies = cookie
+        // Split into individual cookies.
+        .split(';')
+        .map((str) => str.trim())
+        // Turn into object containing key value pairs of cookie name and cookie values.
+        .reduce((obj, str) => {
+          const [key, value] = str.split('=');
+          return {
+            ...obj,
+            [key]: value,
+          };
+        }, {});
+      // Get the one cookie we actually are looking for.
+      req.token = cookies?.[cookieName];
+    }
+    next();
+  };
+}
+
 function getQueryToken(req, res, next) {
   if (req.query.token) req.token = req.query.token;
   return next();
@@ -58,4 +81,4 @@ function verifyToken(options = { showErrors: false }) {
   };
 }
 
-export { getHeaderToken, getQueryToken, verifyToken };
+export { getHeaderToken, getQueryToken, getCookieToken, verifyToken };
