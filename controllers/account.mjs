@@ -111,6 +111,8 @@ async function postLogOut(req, res) {
       expiresAt: new Date(req.tokenData.exp * 1000),
     },
   });
+  // Clear the client cookie.
+  res.clearCookie('refresh');
   return res.status(200).json({
     status: 'success',
     data: null,
