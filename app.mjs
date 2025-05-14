@@ -13,18 +13,20 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// REST tools will have no origin, so allow for that with !origin.
 const whitelist = Array.from(
   process.env.CORS_WHITELIST.split(',').map((str) => str.trim()),
 );
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (whitelist.indexOf(origin) !== -1) {
+      if (whitelist.indexOf(origin) !== -1 || !origin) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
+    credentials: true,
   }),
 );
 

@@ -8,6 +8,7 @@ import authRouter from '../auth.mjs';
 
 import { Router } from 'express';
 import cors from 'cors';
+import 'dotenv/config';
 
 const app = Router();
 
@@ -17,12 +18,17 @@ const whitelist = Array.from(
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (whitelist.indexOf(origin) !== -1) {
+      if (whitelist.indexOf(origin) !== -1 || !origin) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(
+          new Error(
+            'Not allowed by CORS - only admin client can access admin routes',
+          ),
+        );
       }
     },
+    credentials: true,
   }),
 );
 
