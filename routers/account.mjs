@@ -8,7 +8,7 @@ const app = Router();
 app.post('/log-in', validators.createLogInChain(), controller.postLogIn);
 app.post(
   '/log-out',
-  token.getCookieToken,
+  token.getCookieToken('refresh'),
   token.verifyToken({ showErrors: true }),
   controller.postLogOut,
 );
