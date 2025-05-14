@@ -10,6 +10,7 @@ import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
 async function postLogIn(req, res, next) {
   const result = validationResult(req);
@@ -75,7 +76,7 @@ async function postLogIn(req, res, next) {
       // is sent automatically along with API requests initiated from other sites.
       res.cookie('refresh', refresh, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.SECURE_COOKIES,
         sameSite: 'strict',
         // Expire in 28 days just like the refresh token.
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 28),
