@@ -53,17 +53,11 @@ function createAdminLogInChain() {
     body('email').custom(async (value) => {
       const user = await db.user.findUnique({
         where: {
-          email: value,
+          email: value || '',
         },
       });
 
-      if (!user) {
-        // Lie about the user not existing, so bad actors can't
-        // put in lists of emails to figure out who has an account.
-        throw new Error('Incorrect username or password');
-      }
-
-      if (!user.isAdmin) {
+      if (!user?.isAdmin) {
         throw new Error('User is not an admin');
       }
     }),
