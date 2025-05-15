@@ -30,12 +30,20 @@ async function postLogIn(req, res, next) {
       },
     });
 
+    // Mimic format we are using for validationErrors, so if user does not exist
+    // or password is just incorrect, the client will not be able to discern whether
+    // or not a user account exists.
+    const logInFailData = {
+      validationErrors: {
+        password: 'Incorrect email or password.',
+        array: ['Incorrect email or password'],
+      },
+    };
+
     if (!user)
       return res.status(400).json({
         status: 'fail',
-        data: {
-          message: 'Incorrect email or password.',
-        },
+        data: logInFailData,
       });
 
     const match = await bcrypt.compare(req.body.password, user.password);
@@ -92,9 +100,7 @@ async function postLogIn(req, res, next) {
     } else {
       return res.status(400).json({
         status: 'fail',
-        data: {
-          message: 'Incorrect email or password.',
-        },
+        data: logInFailData,
       });
     }
   } catch (error) {
