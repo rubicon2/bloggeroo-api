@@ -4,28 +4,28 @@ import { body, query } from 'express-validator';
 function email() {
   return body('email')
     .trim()
-    .notEmpty()
-    .withMessage('Email is required')
     .isEmail()
-    .withMessage('Email must be in correct format');
+    .withMessage('Email must be in correct format')
+    .notEmpty()
+    .withMessage('Email is required');
 }
 
 function password() {
   return body('password')
-    .notEmpty()
-    .withMessage('Password is required')
     .isStrongPassword({ minLength: 8 })
     .withMessage(
       'Password must be at least 8 characters, with at least one of each: a digit, symbol, upper and lowercase characters',
-    );
+    )
+    .notEmpty()
+    .withMessage('Password is required');
 }
 
 function confirmPassword() {
   return body('confirm_password')
-    .notEmpty()
-    .withMessage('Confirm password is required')
     .custom((value, { req }) => value === req.body.password)
-    .withMessage('Password and confirm password do not match');
+    .withMessage('Password and confirm password do not match')
+    .notEmpty()
+    .withMessage('Confirm password is required');
 }
 
 function createSignUpChain() {
@@ -50,7 +50,7 @@ function createLogInChain() {
 
 function createAdminLogInChain() {
   return [
-    email().custom(async (value) => {
+    body('email').custom(async (value) => {
       const user = await db.user.findUnique({
         where: {
           email: value,
@@ -67,6 +67,7 @@ function createAdminLogInChain() {
         throw new Error('User is not an admin');
       }
     }),
+    email(),
     body('password').notEmpty().withMessage('Password is required'),
   ];
 }
