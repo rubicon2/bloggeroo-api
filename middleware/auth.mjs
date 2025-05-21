@@ -22,7 +22,7 @@ function getUser(options = { showErrors: false }) {
       return next();
     } catch (error) {
       if (options.showErrors) {
-        return res.status(400).json({
+        return res.status(401).json({
           status: 'fail',
           data: {
             message: error.message,

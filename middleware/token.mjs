@@ -67,7 +67,8 @@ function verifyToken(options = { showErrors: false }) {
         return next();
       } catch (error) {
         if (options.showErrors) {
-          return res.status(400).json({
+          // Status code 401 - unauthorised. Client should try to get a new access token in response, then try the original request again.
+          return res.status(401).json({
             status: 'fail',
             data: {
               message: error.message,
