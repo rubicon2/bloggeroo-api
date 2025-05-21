@@ -39,8 +39,9 @@ app.use('/account', adminAccountRouter);
 // Ensure user is logged in and an admin before accessing any other routes.
 app.use(
   token.getHeaderToken,
-  token.verifyToken({ showErrors: true }),
-  auth.getUser({ showErrors: true }),
+  token.verifyToken(),
+  auth.getUser(),
+  auth.isAuth,
   auth.isAdmin,
 );
 
