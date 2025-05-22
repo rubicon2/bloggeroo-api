@@ -1,6 +1,7 @@
 import { formatters, processors } from 'url-query-to-prisma';
 
 const blogsQueryFormatter = {
+  ownerId: formatters.where(),
   title: formatters.where('contains', { mode: 'insensitive' }),
   body: formatters.where('contains', { mode: 'insensitive' }),
   fromDate: formatters.groupWhere('publishedAt', 'gte', processors.date),
