@@ -140,3 +140,5 @@ dist
 
 # Prisma generated files
 generated/
+
+TODO.md
