@@ -35,6 +35,8 @@ app.use(
 // Needs to be before checking user is logged in
 // as admin, otherwise they won't be able to log in.
 app.use('/account', adminAccountRouter);
+// Also without valid access token, will not be considered logged in.
+app.use('/auth', authRouter);
 
 // Ensure user is logged in and an admin before accessing any other routes.
 app.use(
@@ -48,6 +50,5 @@ app.use(
 app.use('/blogs', adminBlogsRouter);
 app.use('/comments', adminCommentsRouter);
 app.use('/users', adminUsersRouter);
-app.use('/auth', authRouter);
 
 export default app;
