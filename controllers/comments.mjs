@@ -144,9 +144,7 @@ async function putComment(req, res, next) {
           id: comment.id,
         },
         data: {
-          text: req.body.text,
-          parentCommentId:
-            req.query?.parentCommentId || comment.parentCommentId,
+          ...req.body,
         },
       });
 

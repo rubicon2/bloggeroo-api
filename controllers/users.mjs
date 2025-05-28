@@ -150,7 +150,6 @@ async function putUser(req, res, next) {
         id: req.params.userId,
       },
       data: {
-        ...user,
         ...req.body,
       },
       omit: {
