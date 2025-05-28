@@ -69,12 +69,17 @@ function createAdminLogInChain() {
 function createBlogChain() {
   return [
     body('title').notEmpty().withMessage('A title is required'),
-    body('publishedAt')
-      .optional()
-      .custom((value) => !isNaN(Date.parse(value)))
-      .withMessage('Published at is not a valid date')
-      // Turn the date string from the form/query into an actual date object.
-      .customSanitizer((value) => new Date(value)),
+    body('publishedAt').customSanitizer((value) => {
+      // A form submitted with no date in the field will send an empty string.
+      // Prisma expects either a DateTime or null, so turn that empty string into a null value.
+      if (value?.length === 0) {
+        return null;
+      } else {
+        // If string is not empty, and can be turned into a valid date, turn it into an actual date object.
+        if (!isNaN(Date.parse(value))) return new Date(value);
+        throw new Error('Published at is not a valid date');
+      }
+    }),
   ];
 }
 
