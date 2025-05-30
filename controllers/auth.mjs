@@ -10,7 +10,7 @@ function postAccess(req, res) {
       isBanned: req.user.isBanned,
     },
     process.env.SECRET,
-    { expiresIn: '15m' },
+    { expiresIn: process.env.ACCESS_TOKEN_LIFETIME },
   );
   return res.status(200).json({
     status: 'success',

@@ -64,7 +64,7 @@ async function postLogIn(req, res, next) {
       // User email on refresh token - when refresh is used, email is used
       // to get user from db, and new access token will be generated.
       const refresh = jwt.sign({ email: user.email }, process.env.SECRET, {
-        expiresIn: '28d',
+        expiresIn: process.env.REFRESH_TOKEN_LIFETIME,
       });
 
       const access = jwt.sign(
@@ -75,7 +75,7 @@ async function postLogIn(req, res, next) {
         },
         process.env.SECRET,
         {
-          expiresIn: '15m',
+          expiresIn: process.env.ACCESS_TOKEN_LIFETIME,
         },
       );
 
@@ -87,7 +87,9 @@ async function postLogIn(req, res, next) {
         secure: process.env.SECURE_COOKIES,
         sameSite: 'strict',
         // Expire in 28 days just like the refresh token.
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 28),
+        // Now refresh token is pulled in from env file, just set this to a year or something stupid?
+        // The refresh token will expire long before the cookie anyway.
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
       });
 
       // Client will store the access token however they like. Not the server's business.
@@ -159,7 +161,7 @@ async function postSignUp(req, res, next) {
           name,
         },
         process.env.SECRET,
-        { expiresIn: '30m' },
+        { expiresIn: process.env.CONFIRM_EMAIL_TOKEN_LIFETIME },
       );
       // Send email to user's email address, containing link with token.
       await sendSignUpConfirmEmail(email, token);
@@ -245,15 +247,14 @@ async function postPasswordResetRequest(req, res, next) {
         email: req.body.email,
       },
       process.env.SECRET,
-      { expiresIn: '30m' },
+      { expiresIn: process.env.RESET_PASSWORD_TOKEN_LIFETIME },
     );
     await sendPasswordResetEmail(req.body.email, token);
 
     return res.status(200).json({
       status: 'success',
       data: {
-        message:
-          'An email has been sent with a link to reset your password. The link will expire in 30 minutes.',
+        message: 'An email has been sent with a link to reset your password.',
       },
     });
   } catch (error) {
@@ -310,15 +311,14 @@ async function postCloseAccountRequest(req, res, next) {
         email: req.tokenData.email,
       },
       process.env.SECRET,
-      { expiresIn: '30m' },
+      { expiresIn: process.env.CLOSE_ACCOUNT_TOKEN_LIFETIME },
     );
     await sendAccountDeleteEmail(req.tokenData.email, token);
 
     return res.status(200).json({
       status: 'success',
       data: {
-        message:
-          'An email has been sent with a link to delete your account. The link will expire in 30 minutes.',
+        message: 'An email has been sent with a link to delete your account.',
       },
     });
   } catch (error) {
