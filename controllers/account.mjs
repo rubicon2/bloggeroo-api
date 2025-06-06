@@ -82,6 +82,7 @@ async function postLogIn(req, res, next) {
       // Refresh token is stored in a secure httpOnly, secure, sameSite strict cookie.
       // This should prevent CSRF (cross-site request forgery) attacks, where an auth cookie
       // is sent automatically along with API requests initiated from other sites.
+      const cookieExpTime = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365);
       res.cookie('refresh', refresh, {
         httpOnly: true,
         secure: process.env.SECURE_COOKIES,
@@ -89,7 +90,15 @@ async function postLogIn(req, res, next) {
         // Expire in 28 days just like the refresh token.
         // Now refresh token is pulled in from env file, just set this to a year or something stupid?
         // The refresh token will expire long before the cookie anyway.
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+        expires: cookieExpTime,
+      });
+
+      // This cookie is set just so the js knows the user is logged in.
+      res.cookie('login', 'true', {
+        httpOnly: false,
+        secure: process.env.SECURE_COOKIES,
+        sameSite: 'strict',
+        expires: cookieExpTime,
       });
 
       // Client will store the access token however they like. Not the server's business.
@@ -122,6 +131,7 @@ async function postLogOut(req, res) {
   });
   // Clear the client cookie.
   res.clearCookie('refresh');
+  res.clearCookie('login');
   return res.status(200).json({
     status: 'success',
     data: null,
