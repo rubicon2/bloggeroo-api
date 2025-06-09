@@ -47,8 +47,8 @@ const usersQueryFormatter = {
   userId: formatters.where(),
   email: formatters.where('contains', { mode: 'insensitive' }),
   name: formatters.where('contains', { mode: 'insensitive' }),
-  isAdmin: formatters.where('contains', { mode: 'insensitive' }),
-  isBanned: formatters.where('contains', { mode: 'insensitive' }),
+  isAdmin: formatters.where(null, {}, () => true), // If there is anything at all, true
+  isBanned: formatters.where(null, {}, () => true), // I.e. checkbox = on === true
   fromCreatedDate: formatters.groupWhere('createdAt', 'gte', processors.date),
   toCreatedDate: formatters.groupWhere('createdAt', 'lte', processors.date),
   fromUpdatedDate: formatters.groupWhere('updatedAt', 'gte', processors.date),
