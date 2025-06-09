@@ -2,6 +2,17 @@ import { formatters, processors } from 'url-query-to-prisma';
 
 const blogsQueryFormatter = {
   ownerId: formatters.where(),
+  author: (obj, key, value) => {
+    obj.where = {
+      ...obj.where,
+      owner: {
+        name: {
+          contains: value,
+          mode: 'insensitive',
+        },
+      },
+    };
+  },
   title: formatters.where('contains', { mode: 'insensitive' }),
   body: formatters.where('contains', { mode: 'insensitive' }),
   fromDate: formatters.groupWhere('publishedAt', 'gte', processors.date),
@@ -11,6 +22,17 @@ const blogsQueryFormatter = {
 const commentsQueryFormatter = {
   blogId: formatters.where(),
   ownerId: formatters.where(),
+  author: (obj, key, value) => {
+    obj.where = {
+      ...obj.where,
+      owner: {
+        name: {
+          contains: value,
+          mode: 'insensitive',
+        },
+      },
+    };
+  },
   parentCommentId: formatters.where(),
   text: formatters.where('contains', { mode: 'insensitive' }),
   fromDate: formatters.groupWhere('createdAt', 'gte', processors.date),
