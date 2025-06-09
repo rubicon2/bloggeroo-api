@@ -15,6 +15,10 @@ const blogsQueryFormatter = {
   },
   title: formatters.where('contains', { mode: 'insensitive' }),
   body: formatters.where('contains', { mode: 'insensitive' }),
+  publishedAt: formatters.where(null, {}, (value) =>
+    // If an actual date, give that, otherwise give null (i.e. unpublished).
+    !isNaN(Date.parse(value)) ? Date.parse(value) : null,
+  ),
   fromDate: formatters.groupWhere('publishedAt', 'gte', processors.date),
   toDate: formatters.groupWhere('publishedAt', 'lte', processors.date),
 };
