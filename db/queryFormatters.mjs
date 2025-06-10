@@ -15,6 +15,14 @@ const blogsQueryFormatter = {
   },
   title: formatters.where('contains', { mode: 'insensitive' }),
   body: formatters.where('contains', { mode: 'insensitive' }),
+  onlyUnpublished: (obj, key, value) => {
+    const filterEnabled = value.length > 0 ? true : false;
+    const filter = filterEnabled ? { publishedAt: null } : {};
+    obj.where = {
+      ...obj.where,
+      ...filter,
+    };
+  },
   publishedAt: formatters.where(null, {}, (value) =>
     // If an actual date, give that, otherwise give null (i.e. unpublished).
     !isNaN(Date.parse(value)) ? Date.parse(value) : null,
