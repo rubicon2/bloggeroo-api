@@ -8,11 +8,7 @@ import { Router } from 'express';
 
 const app = Router();
 
-app.get(
-  '/',
-  urlQueryToPrisma('query', blogsQueryFormatter),
-  controller.getAllBlogs,
-);
+app.get('/', urlQueryToPrisma(blogsQueryFormatter), controller.getAllBlogs);
 app.post('/', validateBlog(), controller.postBlog);
 app.put('/:blogId', validateBlog(), controller.putBlog);
 app.delete('/:blogId', controller.deleteBlog);

@@ -9,11 +9,7 @@ import { Router } from 'express';
 
 const app = Router();
 
-app.get(
-  '/',
-  urlQueryToPrisma('query', commentsQueryFormatter),
-  controller.getComments,
-);
+app.get('/', urlQueryToPrisma(commentsQueryFormatter), controller.getComments);
 
 app.get('/:commentId', controller.getComment);
 

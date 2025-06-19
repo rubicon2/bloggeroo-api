@@ -11,11 +11,7 @@ import { Router } from 'express';
 
 const app = Router();
 
-app.get(
-  '/',
-  urlQueryToPrisma('query', usersQueryFormatter),
-  controller.getUsers,
-);
+app.get('/', urlQueryToPrisma(usersQueryFormatter), controller.getUsers);
 app.post('/', validateNewUser(), controller.postUser);
 app.put('/:userId', validateUser(), controller.putUser);
 app.delete('/:userId', controller.deleteUser);

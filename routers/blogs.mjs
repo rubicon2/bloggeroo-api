@@ -13,7 +13,7 @@ app.get(
   token.getHeaderToken,
   token.verifyToken(),
   auth.getUser(),
-  urlQueryToPrisma('query', blogsQueryFormatter),
+  urlQueryToPrisma(blogsQueryFormatter),
   controller.getPublishedBlogs,
 );
 

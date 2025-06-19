@@ -2,19 +2,25 @@ import { formatters, processors } from 'url-query-to-prisma';
 
 const blogsQueryFormatter = {
   ownerId: formatters.where(),
-  author: (obj, key, value) => {
-    obj.where = {
-      ...obj.where,
-      owner: {
-        name: {
-          contains: value,
-          mode: 'insensitive',
-        },
-      },
-    };
-  },
-  title: formatters.where('contains', { mode: 'insensitive' }),
-  body: formatters.where('contains', { mode: 'insensitive' }),
+  author: formatters.whereContains({
+    caseSensitive: false,
+    tableColName: 'owner.name',
+  }),
+  title: formatters.whereContains({ caseSensitive: false }),
+  body: formatters.whereContains({ caseSensitive: false }),
+  publishedAt: formatters.where({
+    valueProcessor: (v) => (!isNaN(Date.parse(v)) ? Date.parse(v) : null),
+  }),
+  fromDate: formatters.where({
+    filterType: 'gte',
+    valueProcessor: processors.date,
+    tableColName: 'publishedAt',
+  }),
+  toDate: formatters.where({
+    filterType: 'lte',
+    valueProcessor: processors.date,
+    tableColName: 'publishedAt',
+  }),
   onlyUnpublished: (obj, key, value) => {
     const filterEnabled = value.length > 0 ? true : false;
     const filter = filterEnabled ? { publishedAt: null } : {};
@@ -23,44 +29,55 @@ const blogsQueryFormatter = {
       ...filter,
     };
   },
-  publishedAt: formatters.where(null, {}, (value) =>
-    // If an actual date, give that, otherwise give null (i.e. unpublished).
-    !isNaN(Date.parse(value)) ? Date.parse(value) : null,
-  ),
-  fromDate: formatters.groupWhere('publishedAt', 'gte', processors.date),
-  toDate: formatters.groupWhere('publishedAt', 'lte', processors.date),
 };
 
 const commentsQueryFormatter = {
   blogId: formatters.where(),
   ownerId: formatters.where(),
-  author: (obj, key, value) => {
-    obj.where = {
-      ...obj.where,
-      owner: {
-        name: {
-          contains: value,
-          mode: 'insensitive',
-        },
-      },
-    };
-  },
   parentCommentId: formatters.where(),
-  text: formatters.where('contains', { mode: 'insensitive' }),
-  fromDate: formatters.groupWhere('createdAt', 'gte', processors.date),
-  toDate: formatters.groupWhere('createdAt', 'lte', processors.date),
+  author: formatters.whereContains({
+    caseSensitive: false,
+    tableColName: 'owner.name',
+  }),
+  text: formatters.whereContains({ caseSensitive: false }),
+  fromDate: formatters.where({
+    filterType: 'gte',
+    valueProcessor: processors.date,
+    tableColName: 'createdAt',
+  }),
+  toDate: formatters.where({
+    filterType: 'lte',
+    valueProcessor: processors.date,
+    tableColName: 'createdAt',
+  }),
 };
 
 const usersQueryFormatter = {
-  userId: formatters.where(),
-  email: formatters.where('contains', { mode: 'insensitive' }),
-  name: formatters.where('contains', { mode: 'insensitive' }),
-  isAdmin: formatters.where(null, {}, () => true), // If there is anything at all, true
-  isBanned: formatters.where(null, {}, () => true), // I.e. checkbox = on === true
-  fromCreatedDate: formatters.groupWhere('createdAt', 'gte', processors.date),
-  toCreatedDate: formatters.groupWhere('createdAt', 'lte', processors.date),
-  fromUpdatedDate: formatters.groupWhere('updatedAt', 'gte', processors.date),
-  toUpdatedDate: formatters.groupWhere('updatedAt', 'lte', processors.date),
+  userId: formatters.where({ tableColName: 'id' }),
+  email: formatters.whereContains({ caseSensitive: false }),
+  name: formatters.whereContains({ caseSensitive: false }),
+  isAdmin: formatters.where({ valueProcessor: () => true }), // If there is anything at all, true
+  isBanned: formatters.where({ valueProcessor: () => true }), // I.e. checkbox = on === true
+  fromCreatedDate: formatters.where({
+    filterType: 'gte',
+    valueProcessor: processors.date,
+    tableColName: 'createdAt',
+  }),
+  toCreatedDate: formatters.where({
+    filterType: 'lte',
+    valueProcessor: processors.date,
+    tableColName: 'createdAt',
+  }),
+  fromUpdatedDate: formatters.where({
+    filterType: 'gte',
+    valueProcessor: processors.date,
+    tableColName: 'updatedAt',
+  }),
+  toUpdatedDate: formatters.where({
+    filterType: 'lte',
+    valueProcessor: processors.date,
+    tableColName: 'updatedAt',
+  }),
 };
 
 export { blogsQueryFormatter, commentsQueryFormatter, usersQueryFormatter };
