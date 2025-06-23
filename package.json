@@ -41,6 +41,6 @@
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.10.0",
-    "url-query-to-prisma": "^2.0.0"
+    "url-query-to-prisma": "^2.0.2"
   }
 }
