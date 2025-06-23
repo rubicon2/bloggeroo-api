@@ -33,6 +33,7 @@ const blogsQueryFormatter = {
 
 const commentsQueryFormatter = {
   blogId: formatters.where(),
+  'blog.title': formatters.whereContains({ caseSensitive: false }),
   ownerId: formatters.where(),
   parentCommentId: formatters.where(),
   author: formatters.whereContains({
