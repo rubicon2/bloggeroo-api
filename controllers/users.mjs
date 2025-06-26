@@ -145,6 +145,37 @@ async function putUser(req, res, next) {
       });
     }
 
+    // How many admins are there other than the current user (who should be an admin)?
+    const otherAdminCount = await db.user.count({
+      where: {
+        id: {
+          not: user.id,
+        },
+        isAdmin: true,
+        isBanned: false,
+      },
+    });
+
+    // Make sure the user can't remove the last admin.
+    if (otherAdminCount === 0 && !req.body.isAdmin) {
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          message: 'You are not allowed to remove the last admin',
+        },
+      });
+    }
+
+    // Make sure the user can't ban the last admin.
+    if (otherAdminCount === 0 && req.body.isAdmin && req.body.isBanned) {
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          message: 'You are not allowed to ban the last admin',
+        },
+      });
+    }
+
     const updated = await db.user.update({
       where: {
         id: req.params.userId,
@@ -182,6 +213,27 @@ async function deleteUser(req, res, next) {
         status: 'fail',
         data: {
           message: 'That user does not exist',
+        },
+      });
+    }
+
+    // How many admins are there other than the current user (who should be an admin)?
+    const otherAdminCount = await db.user.count({
+      where: {
+        id: {
+          not: user.id,
+        },
+        isAdmin: true,
+        isBanned: false,
+      },
+    });
+
+    // Make sure the user can't remove the last admin.
+    if (otherAdminCount === 0) {
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          message: 'You are not allowed to delete the last admin',
         },
       });
     }
