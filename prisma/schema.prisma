@@ -50,7 +50,7 @@ model Comment {
   parentCommentId String?
   parentComment   Comment?  @relation("replies", fields: [parentCommentId], references: [id], onDelete: Cascade)
   ownerId         String
-  owner           User      @relation(fields: [ownerId], references: [id])
+  owner           User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   blogId          String
   blog            Blog      @relation(fields: [blogId], references: [id], onDelete: Cascade)
 }
