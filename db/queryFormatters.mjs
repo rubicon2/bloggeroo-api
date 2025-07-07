@@ -1,6 +1,7 @@
 import { formatters, processors } from 'url-query-to-prisma';
 
 const blogsQueryFormatter = {
+  blogId: formatters.where({ tableColName: 'id' }),
   ownerId: formatters.where(),
   author: formatters.whereContains({
     caseSensitive: false,
@@ -32,6 +33,7 @@ const blogsQueryFormatter = {
 };
 
 const commentsQueryFormatter = {
+  commentId: formatters.where({ tableColName: 'id' }),
   blogId: formatters.where(),
   'blog.title': formatters.whereContains({ caseSensitive: false }),
   ownerId: formatters.where(),
