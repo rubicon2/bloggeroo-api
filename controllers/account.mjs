@@ -69,6 +69,7 @@ async function postLogIn(req, res, next) {
 
       const access = jwt.sign(
         {
+          id: user.id,
           email: user.email,
           isAdmin: user.isAdmin,
           isBanned: user.isBanned,
