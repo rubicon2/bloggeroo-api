@@ -253,6 +253,23 @@ async function postPasswordResetRequest(req, res, next) {
       });
     }
 
+    // Check user actually exists first.
+    const user = await db.user.findUnique({
+      where: {
+        email: req.body.email,
+      },
+    });
+
+    if (!user) {
+      // Just pretend an email was sent.
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          message: 'An email has been sent with a link to reset your password.',
+        },
+      });
+    }
+
     // Send email with link to reset password.
     const token = jwt.sign(
       {
@@ -282,6 +299,23 @@ async function postPasswordReset(req, res, next) {
         status: 'fail',
         data: {
           validationErrors: formatValidationErrors(result.array()),
+        },
+      });
+    }
+
+    // If account doesn't exist, just pretend to update - stop hackers from
+    // figuring out whether or not an email is associated with an account.
+    const user = await db.user.findFirst({
+      where: {
+        email: req.tokenData.email,
+      },
+    });
+
+    if (!user) {
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          message: 'Your password has been successfully updated.',
         },
       });
     }
