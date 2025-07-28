@@ -27,6 +27,17 @@ async function getComments(req, res, next) {
             isBanned: true,
           },
         },
+        parentComment: {
+          include: {
+            owner: {
+              select: {
+                name: true,
+                isAdmin: true,
+                isBanned: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -53,6 +64,17 @@ async function getComment(req, res, next) {
             name: true,
             isAdmin: true,
             isBanned: true,
+          },
+        },
+        parentComment: {
+          include: {
+            owner: {
+              select: {
+                name: true,
+                isAdmin: true,
+                isBanned: true,
+              },
+            },
           },
         },
       },
