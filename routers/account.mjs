@@ -15,7 +15,7 @@ app.post(
 app.post('/sign-up', validators.createSignUpChain(), controller.postSignUp);
 app.post(
   '/confirm-email',
-  token.getQueryToken,
+  token.getHeaderToken,
   token.verifyToken({ showErrors: true }),
   controller.postConfirmEmail,
 );
@@ -27,7 +27,7 @@ app.post(
 app.post(
   '/reset-password',
   validators.createResetPasswordChain(),
-  token.getQueryToken,
+  token.getHeaderToken,
   token.verifyToken({ showErrors: true }),
   controller.postPasswordReset,
 );
