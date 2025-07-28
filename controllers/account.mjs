@@ -227,6 +227,7 @@ async function postConfirmEmail(req, res, next) {
     return res.status(201).json({
       status: 'success',
       data: {
+        message: 'Your email has been successfully confirmed.',
         user: {
           email: user.email,
           name: user.name,
@@ -307,7 +308,7 @@ async function postPasswordReset(req, res, next) {
     return res.status(200).json({
       status: 'success',
       data: {
-        message: 'Password has been updated',
+        message: 'Your password has been successfully updated.',
       },
     });
   } catch (error) {
@@ -357,7 +358,7 @@ async function deleteAccount(req, res, next) {
     return res.status(200).json({
       status: 'success',
       data: {
-        message: 'User successfully deleted',
+        message: 'Your account has been successfully deleted.',
         user: {
           id: user.id,
           email: user.email,
