@@ -303,6 +303,14 @@ async function postPasswordReset(req, res, next) {
       });
     }
 
+    // Add token to blacklist so it cannot be used again.
+    await db.revokedToken.create({
+      data: {
+        token: req.token,
+        expiresAt: new Date(req.tokenData.exp * 1000),
+      },
+    });
+
     // If account doesn't exist, just pretend to update - stop hackers from
     // figuring out whether or not an email is associated with an account.
     const user = await db.user.findFirst({
@@ -328,14 +336,6 @@ async function postPasswordReset(req, res, next) {
       },
       data: {
         password: hash,
-      },
-    });
-
-    // Add token to blacklist so it cannot be used again.
-    await db.revokedToken.create({
-      data: {
-        token: req.token,
-        expiresAt: new Date(req.tokenData.exp * 1000),
       },
     });
 
