@@ -20,6 +20,9 @@ const whitelist = Array.from(
 app.use(
   cors({
     origin: (origin, callback) => {
+      console.log('whitelist:', whitelist);
+      console.log('origin:', origin);
+      console.log('index:', whitelist.indexOf(origin));
       if (whitelist.indexOf(origin) !== -1 || !origin) {
         callback(null, true);
       } else {
