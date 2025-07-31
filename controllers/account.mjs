@@ -88,6 +88,7 @@ async function postLogIn(req, res, next) {
         httpOnly: true,
         secure: process.env.SECURE_COOKIES,
         sameSite: 'none',
+        partitioned: true,
         // Expire in 28 days just like the refresh token.
         // Now refresh token is pulled in from env file, just set this to a year or something stupid?
         // The refresh token will expire long before the cookie anyway.
@@ -99,6 +100,7 @@ async function postLogIn(req, res, next) {
         httpOnly: false,
         secure: process.env.SECURE_COOKIES,
         sameSite: 'none',
+        partitioned: true,
         expires: cookieExpTime,
       });
 
