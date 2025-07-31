@@ -10,6 +10,8 @@ async function getPublishedBlogs(req, res, next) {
         ...req.prismaQueryParams.where,
         publishedAt: {
           not: null,
+          lte: new Date(Date.now()),
+          ...req.prismaQueryParams.where?.publishedAt,
         },
       },
       include: {
