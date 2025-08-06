@@ -15,6 +15,7 @@ async function getPublishedBlogs(req, res, next) {
         },
       },
       include: {
+        comments: true,
         owner: {
           select: {
             name: true,
@@ -41,6 +42,7 @@ async function getAllBlogs(req, res, next) {
     const blogs = await db.blog.findMany({
       ...req.prismaQueryParams,
       include: {
+        comments: true,
         owner: {
           select: {
             name: true,
