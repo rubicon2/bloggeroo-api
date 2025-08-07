@@ -133,8 +133,18 @@ async function postLogOut(req, res) {
     },
   });
   // Clear the client cookie.
-  res.clearCookie('refresh');
-  res.clearCookie('login');
+  res.clearCookie('refresh', {
+    httpOnly: true,
+    secure: process.env.SECURE_COOKIES,
+    sameSite: 'none',
+    partitioned: true,
+  });
+  res.clearCookie('login', {
+    httpOnly: false,
+    secure: process.env.SECURE_COOKIES,
+    sameSite: 'none',
+    partitioned: true,
+  });
   return res.status(200).json({
     status: 'success',
     data: null,
