@@ -87,6 +87,7 @@ async function postLogIn(req, res, next) {
       res.cookie('refresh', refresh, {
         httpOnly: true,
         secure: process.env.SECURE_COOKIES,
+        domain: process.env.COOKIE_DOMAIN,
         sameSite: 'none',
         partitioned: true,
         // Expire in 28 days just like the refresh token.
@@ -99,6 +100,7 @@ async function postLogIn(req, res, next) {
       res.cookie('login', 'true', {
         httpOnly: false,
         secure: process.env.SECURE_COOKIES,
+        domain: process.env.COOKIE_DOMAIN,
         sameSite: 'none',
         partitioned: true,
         expires: cookieExpTime,
@@ -136,12 +138,14 @@ async function postLogOut(req, res) {
   res.clearCookie('refresh', {
     httpOnly: true,
     secure: process.env.SECURE_COOKIES,
+    domain: process.env.COOKIE_DOMAIN,
     sameSite: 'none',
     partitioned: true,
   });
   res.clearCookie('login', {
     httpOnly: false,
     secure: process.env.SECURE_COOKIES,
+    domain: process.env.COOKIE_DOMAIN,
     sameSite: 'none',
     partitioned: true,
   });
