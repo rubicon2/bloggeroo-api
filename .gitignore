@@ -142,3 +142,6 @@ dist
 generated/
 
 TODO.md
+
+# Static dir for testing file uploads.
+static/
