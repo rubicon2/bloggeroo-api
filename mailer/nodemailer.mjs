@@ -11,7 +11,7 @@ const EMAIL_ADDRESS = process.env.MAIL_EMAIL;
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_SERVER,
   port: process.env.MAIL_SERVER_PORT,
-  secure: false,
+  secure: process.env.MAIL_SERVER_SECURE,
   auth: {
     user: process.env.MAIL_EMAIL,
     pass: process.env.MAIL_PASSWORD,
