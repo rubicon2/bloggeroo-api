@@ -19,9 +19,9 @@
   },
   "homepage": "https://github.com/rubicon2/bloggeroo-api#readme",
   "devDependencies": {
-    "@eslint/css": "^0.6.0",
+    "@eslint/css": "^0.14.1",
     "@eslint/js": "^9.24.0",
-    "@eslint/json": "^0.11.0",
+    "@eslint/json": "^0.14.0",
     "@eslint/markdown": "^6.3.0",
     "@types/node": "^22.14.0",
     "eslint": "^9.24.0",
@@ -40,7 +40,7 @@
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.10.0",
+    "nodemailer": "^7.0.12",
     "url-query-to-prisma": "^2.0.2"
   }
 }
