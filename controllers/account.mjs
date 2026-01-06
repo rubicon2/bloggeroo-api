@@ -4,7 +4,7 @@ import {
   sendAttemptedSignUpEmail,
   sendPasswordResetEmail,
   sendAccountDeleteEmail,
-} from '../mailer/nodemailer.mjs';
+} from '../mailer/mailgun.mjs';
 import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 
 import { validationResult } from 'express-validator';
