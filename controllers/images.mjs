@@ -22,6 +22,37 @@ async function getImages(req, res, next) {
   }
 }
 
+async function getImage(req, res, next) {
+  try {
+    const image = await db.image.findUnique({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    if (!image) {
+      return res.status(404).json({
+        status: 'fail',
+        data: {
+          message: 'Image not found',
+        },
+      });
+    }
+
+    return res.json({
+      status: 'success',
+      data: {
+        image: {
+          ...image,
+          url: createStaticUrl(image.fileName),
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function postImage(req, res, next) {
   try {
     const result = validationResult(req);
@@ -80,4 +111,4 @@ async function postImage(req, res, next) {
   }
 }
 
-export { getImages, postImage };
+export { getImages, getImage, postImage };
