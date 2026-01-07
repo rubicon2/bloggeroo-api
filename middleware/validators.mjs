@@ -121,6 +121,39 @@ function createNewUserChain() {
   return [createUserChain(), password(), confirmPassword()];
 }
 
+function createImageAltTextChain() {
+  return body('altText').trim().notEmpty().withMessage('Alt text is required');
+}
+
+function createImageDisplayNameChain() {
+  return body('displayName')
+    .trim()
+    .notEmpty()
+    .withMessage('A display name is required')
+    .custom(async (value, { req }) => {
+      const existing = await db.image.findUnique({
+        where: {
+          ownerId_displayName: {
+            ownerId: req.user.id,
+            displayName: value,
+          },
+        },
+      });
+      if (existing) throw new Error('Display name already used by this user');
+    });
+}
+
+function createNewImageChain() {
+  return [createImageAltTextChain(), createImageDisplayNameChain()];
+}
+
+function createPutImageChain() {
+  return [
+    createImageAltTextChain().optional(),
+    createImageDisplayNameChain().optional(),
+  ];
+}
+
 export {
   email,
   password,
@@ -132,4 +165,6 @@ export {
   createCommentChain,
   createUserChain,
   createNewUserChain,
+  createNewImageChain,
+  createPutImageChain,
 };
