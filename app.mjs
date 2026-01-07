@@ -12,6 +12,10 @@ import 'dotenv/config';
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(
+  '/' + process.env.SERVER_STATIC_DIR,
+  express.static(process.env.VOLUME_MOUNT_PATH),
+);
 
 // REST tools will have no origin, so allow for that with !origin.
 const whitelist = Array.from(
