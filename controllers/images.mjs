@@ -1,6 +1,7 @@
 import createStaticUrl from '../helpers/createStaticUrl.mjs';
 import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 import db from '../db/prismaClient.mjs';
+import * as volume from '../helpers/volume.mjs';
 import { validationResult, matchedData } from 'express-validator';
 import fs from 'node:fs/promises';
 
@@ -61,7 +62,7 @@ async function postImage(req, res, next) {
       // If image uploaded by multer, delete it. Otherwise there will be a file on
       // the volume which we have no db entry for and won't be able to delete easily.
       if (req.file) {
-        await fs.rm(req.file.path);
+        await volume.deleteFile(req.file.filename);
       }
 
       const validationErrors = result.array();
@@ -135,7 +136,7 @@ async function putImage(req, res, next) {
       // If a new image has been uploaded, delete it.
       // The db entry won't get updated, so it needs to go.
       if (req.file) {
-        await fs.rm(req.file.path);
+        await volume.deleteFile(req.file.filename);
       }
 
       return res.status(400).json({
@@ -150,7 +151,7 @@ async function putImage(req, res, next) {
 
     // If a new image has been uploaded, delete the old one from the volume, then update the db.
     if (req.file) {
-      await fs.rm(`${process.env.VOLUME_MOUNT_PATH}/${existingImage.fileName}`);
+      await volume.deleteFile(existingImage.fileName);
       // Add onto matched data so the db entry gets updated with the new file name.
       data.fileName = req.file.filename;
     }
