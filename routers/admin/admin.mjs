@@ -4,6 +4,7 @@ import adminAccountRouter from './adminAccount.mjs';
 import adminBlogsRouter from './adminBlogs.mjs';
 import adminCommentsRouter from './adminComments.mjs';
 import adminUsersRouter from './adminUsers.mjs';
+import adminImagesRouter from './adminImages.mjs';
 import authRouter from '../auth.mjs';
 
 import { Router } from 'express';
@@ -50,5 +51,6 @@ app.use(
 app.use('/blogs', adminBlogsRouter);
 app.use('/comments', adminCommentsRouter);
 app.use('/users', adminUsersRouter);
+app.use('/images', adminImagesRouter);
 
 export default app;

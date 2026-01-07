@@ -140,3 +140,6 @@ dist
 
 # Prisma generated files
 generated/
+
+# Static dir for testing file uploads.
+static/

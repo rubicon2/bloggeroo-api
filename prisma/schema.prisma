@@ -26,6 +26,13 @@ model User {
   isBanned  Boolean   @default(false)
   blogs     Blog[]
   comments  Comment[]
+  images    Image[]
+}
+
+model RevokedToken {
+  id        String   @id @default(uuid())
+  token     String
+  expiresAt DateTime
 }
 
 model Blog {
@@ -39,6 +46,7 @@ model Blog {
   comments    Comment[]
   ownerId     String
   owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  images      Image[]
 }
 
 model Comment {
@@ -55,8 +63,20 @@ model Comment {
   blog            Blog      @relation(fields: [blogId], references: [id], onDelete: Cascade)
 }
 
-model RevokedToken {
-  id        String   @id @default(uuid())
-  token     String
-  expiresAt DateTime
+model Image {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  displayName String
+  fileName    String   @unique
+  altText     String
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  // Keep track of what blogs use the image, so user can tell how many blogs use 
+  // the image, or server can delete an image that is no longer used in any blogs.
+  blogs       Blog[]
+
+  // So each user's photos must have unique display names, but if
+  // multiple owners have photos with the same name, that's fine.
+  @@unique([ownerId, displayName])
 }
