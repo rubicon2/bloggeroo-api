@@ -133,6 +133,9 @@ function createImageDisplayNameChain() {
     .custom(async (value, { req }) => {
       const existing = await db.image.findUnique({
         where: {
+          NOT: {
+            id: req.params.id,
+          },
           ownerId_displayName: {
             ownerId: req.user.id,
             displayName: value,
