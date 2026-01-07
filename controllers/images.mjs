@@ -4,6 +4,24 @@ import db from '../db/prismaClient.mjs';
 import { validationResult, matchedData } from 'express-validator';
 import fs from 'node:fs/promises';
 
+async function getImages(req, res, next) {
+  try {
+    const images = await db.image.findMany();
+
+    return res.json({
+      status: 'success',
+      data: {
+        images: images.map((image) => ({
+          ...image,
+          url: createStaticUrl(image.fileName),
+        })),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function postImage(req, res, next) {
   try {
     const result = validationResult(req);
@@ -62,4 +80,4 @@ async function postImage(req, res, next) {
   }
 }
 
-export { postImage };
+export { getImages, postImage };
