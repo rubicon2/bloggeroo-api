@@ -111,4 +111,70 @@ async function postImage(req, res, next) {
   }
 }
 
-export { getImages, getImage, postImage };
+async function putImage(req, res, next) {
+  try {
+    // Check image id exists before bothering to do anything else.
+    const existingImage = await db.image.findUnique({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    if (!existingImage) {
+      return res.status(404).json({
+        status: 'fail',
+        data: {
+          message: 'That image does not exist',
+        },
+      });
+    }
+
+    const validation = validationResult(req);
+
+    if (!validation.isEmpty()) {
+      // If a new image has been uploaded, delete it.
+      // The db entry won't get updated, so it needs to go.
+      if (req.file) {
+        await fs.rm(req.file.path);
+      }
+
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          validationErrors: formatValidationErrors(validation.array()),
+        },
+      });
+    }
+
+    const data = matchedData(req);
+
+    // If a new image has been uploaded, delete the old one from the volume, then update the db.
+    if (req.file) {
+      await fs.rm(`${process.env.VOLUME_MOUNT_PATH}/${existingImage.fileName}`);
+      // Add onto matched data so the db entry gets updated with the new file name.
+      data.fileName = req.file.filename;
+    }
+
+    const updated = await db.image.update({
+      where: {
+        id: req.params.id,
+      },
+      data,
+    });
+
+    return res.json({
+      status: 'success',
+      data: {
+        message: 'Image successfully updated',
+        image: {
+          ...updated,
+          url: createStaticUrl(updated.fileName),
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export { getImages, getImage, postImage, putImage };
