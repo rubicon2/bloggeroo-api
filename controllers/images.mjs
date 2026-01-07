@@ -3,7 +3,6 @@ import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 import db from '../db/prismaClient.mjs';
 import * as volume from '../helpers/volume.mjs';
 import { validationResult, matchedData } from 'express-validator';
-import fs from 'node:fs/promises';
 
 async function getImages(req, res, next) {
   try {
