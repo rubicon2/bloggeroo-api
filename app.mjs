@@ -13,7 +13,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
-  '/' + process.env.SERVER_STATIC_DIR,
+  process.env.SERVER_STATIC_DIR,
   express.static(process.env.VOLUME_MOUNT_PATH),
 );
 
