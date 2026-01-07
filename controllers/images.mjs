@@ -178,4 +178,54 @@ async function putImage(req, res, next) {
   }
 }
 
-export { getImages, getImage, postImage, putImage };
+async function deleteImage(req, res, next) {
+  try {
+    // Check image with id exists before doing anything else.
+    const existingImage = await db.image.findUnique({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    if (!existingImage) {
+      return res.status(404).json({
+        status: 'fail',
+        data: {
+          message: 'That image does not exist',
+        },
+      });
+    }
+
+    try {
+      // If image exists, delete the file it points to.
+      // If no file exists, this will throw an error.
+      await volume.deleteFile(existingImage.fileName);
+    } catch (error) {
+      // Just catch the error and print the info before deleting the db entry.
+      // If we don't catch it here, the rest of the try block will be skipped
+      // and the db entry won't get deleted, success res won't get sent, etc.
+      console.trace(
+        `Tried to delete ${existingImage.fileName}, but it doesn't exist`,
+      );
+      console.log(error.message);
+    }
+
+    // Then delete the db entry.
+    await db.image.delete({
+      where: {
+        id: existingImage.id,
+      },
+    });
+
+    return res.json({
+      status: 'success',
+      data: {
+        message: 'Image successfully deleted',
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export { getImages, getImage, postImage, putImage, deleteImage };
