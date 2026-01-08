@@ -83,4 +83,41 @@ const usersQueryFormatter = {
   }),
 };
 
-export { blogsQueryFormatter, commentsQueryFormatter, usersQueryFormatter };
+const imagesQueryFormatter = {
+  imageId: formatters.where({ tableColName: 'id' }),
+  ownerId: formatters.where(),
+  displayName: formatters.whereContains({ caseSensitive: false }),
+  fileName: formatters.whereContains({ caseSensitive: false }),
+  altText: formatters.whereContains({ caseSensitive: false }),
+  blogId: formatters.where({
+    tableColName: 'blogs',
+    valueProcessor: (v) => ({ some: { id: v } }),
+  }),
+  fromCreatedDate: formatters.where({
+    filterType: 'gte',
+    valueProcessor: processors.date,
+    tableColName: 'createdAt',
+  }),
+  toCreatedDate: formatters.where({
+    filterType: 'lte',
+    valueProcessor: processors.date,
+    tableColName: 'createdAt',
+  }),
+  fromUpdatedDate: formatters.where({
+    filterType: 'gte',
+    valueProcessor: processors.date,
+    tableColName: 'updatedAt',
+  }),
+  toUpdatedDate: formatters.where({
+    filterType: 'lte',
+    valueProcessor: processors.date,
+    tableColName: 'updatedAt',
+  }),
+};
+
+export {
+  blogsQueryFormatter,
+  commentsQueryFormatter,
+  usersQueryFormatter,
+  imagesQueryFormatter,
+};
