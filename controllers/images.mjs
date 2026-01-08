@@ -6,7 +6,7 @@ import { validationResult, matchedData } from 'express-validator';
 
 async function getImages(req, res, next) {
   try {
-    const images = await db.image.findMany();
+    const images = await db.image.findMany(req.prismaQueryParams);
 
     return res.json({
       status: 'success',
