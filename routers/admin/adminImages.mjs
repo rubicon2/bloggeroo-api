@@ -1,11 +1,13 @@
 import * as controller from '../../controllers/images.mjs';
 import * as validators from '../../middleware/validators.mjs';
+import { imagesQueryFormatter } from '../../db/queryFormatters.mjs';
 import upload from '../../middleware/multer.mjs';
+import { urlQueryToPrisma } from 'url-query-to-prisma';
 import { Router } from 'express';
 
 const app = Router();
 
-app.get('/', controller.getImages);
+app.get('/', urlQueryToPrisma(imagesQueryFormatter), controller.getImages);
 app.post(
   '/',
   upload.single('image'),
