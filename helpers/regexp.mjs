@@ -7,4 +7,8 @@ function createStaticLinkRegExp(flags) {
   );
 }
 
-export { createStaticLinkRegExp };
+function createStaticFileNameRegExp(flags) {
+  return new RegExp(`(?<=\\/)[^\\.\\/]+\\.\\w+`, flags);
+}
+
+export { createStaticLinkRegExp, createStaticFileNameRegExp };
