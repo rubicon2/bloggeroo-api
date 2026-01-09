@@ -1,4 +1,5 @@
 import db from '../db/prismaClient.mjs';
+import getImagesFromBlogBody from '../helpers/getImagesFromBlogBody.mjs';
 import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
 import { validationResult } from 'express-validator';
 
@@ -77,6 +78,7 @@ async function postBlog(req, res, next) {
 
   try {
     const { title, body, publishedAt } = req.body;
+
     const blog = await db.blog.create({
       data: {
         ownerId: req.user.id,
@@ -132,12 +134,21 @@ async function putBlog(req, res, next) {
       });
     }
 
+    // Get image db entries from links in blog body and then connect blog to those db entries.
+    const blogImages = await getImagesFromBlogBody(req.body.body);
+
     const updated = await db.blog.update({
       where: {
         id: req.params.blogId,
       },
       data: {
         ...req.body,
+        images: {
+          set: blogImages,
+        },
+      },
+      include: {
+        images: true,
       },
     });
 
