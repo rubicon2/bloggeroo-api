@@ -79,12 +79,21 @@ async function postBlog(req, res, next) {
   try {
     const { title, body, publishedAt } = req.body;
 
+    // Get image db entries from links in blog body and then connect blog to those db entries.
+    const blogImages = await getImagesFromBlogBody(body);
+
     const blog = await db.blog.create({
       data: {
         ownerId: req.user.id,
         title,
         body: body || '',
         publishedAt: publishedAt ? new Date(publishedAt) : null,
+        images: {
+          connect: blogImages,
+        },
+      },
+      include: {
+        images: true,
       },
     });
     return res.status(201).json({
