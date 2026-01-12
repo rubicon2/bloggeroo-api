@@ -5,6 +5,7 @@
   "main": "app.mjs",
   "scripts": {
     "dev": "node --watch app.mjs",
+    "migrate": "npx prisma migrate deploy",
     "start": "node app.mjs"
   },
   "repository": {
