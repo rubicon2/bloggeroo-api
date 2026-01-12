@@ -7,7 +7,9 @@ export default async function getImagesFromBlogBody(body) {
 
   // Extract file names from imageLinks with another regexp.
   const linkRegExp = regexp.createStaticFileNameRegExp();
-  const fileNames = imageLinks.map((link) => link.match(linkRegExp)[0]);
+  const fileNames = imageLinks
+    ? imageLinks.map((link) => link.match(linkRegExp)[0])
+    : [];
 
   // Find on database.
   const images = await db.image.findMany({
