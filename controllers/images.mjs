@@ -6,7 +6,27 @@ import { validationResult, matchedData } from 'express-validator';
 
 async function getImages(req, res, next) {
   try {
-    const images = await db.image.findMany(req.prismaQueryParams);
+    const images = await db.image.findMany({
+      ...req.prismaQueryParams,
+      include: {
+        blogs: {
+          select: {
+            id: true,
+            title: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          orderBy: [
+            {
+              createdAt: 'desc',
+            },
+            {
+              id: 'asc',
+            },
+          ],
+        },
+      },
+    });
 
     return res.json({
       status: 'success',
@@ -27,6 +47,24 @@ async function getImage(req, res, next) {
     const image = await db.image.findUnique({
       where: {
         id: req.params.id,
+      },
+      include: {
+        blogs: {
+          select: {
+            id: true,
+            title: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          orderBy: [
+            {
+              createdAt: 'desc',
+            },
+            {
+              id: 'asc',
+            },
+          ],
+        },
       },
     });
 
