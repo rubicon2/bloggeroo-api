@@ -1,7 +1,9 @@
+import db from '../db/prismaClient.mjs';
 import createStaticUrl from '../helpers/createStaticUrl.mjs';
 import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
-import db from '../db/prismaClient.mjs';
 import * as volume from '../helpers/volume.mjs';
+import { createMarkdownImgLinkRegExp } from '../helpers/regexp.mjs';
+
 import { validationResult, matchedData } from 'express-validator';
 
 async function getImages(req, res, next) {
@@ -156,6 +158,18 @@ async function putImage(req, res, next) {
       where: {
         id: req.params.id,
       },
+      include: {
+        blogs: {
+          orderBy: [
+            {
+              updatedAt: 'desc',
+            },
+            {
+              id: 'asc',
+            },
+          ],
+        },
+      },
     });
 
     if (!existingImage) {
@@ -199,6 +213,25 @@ async function putImage(req, res, next) {
       },
       data,
     });
+
+    for (const blog of existingImage.blogs) {
+      // Replace links to existing image with location of new image, any updated alt text, etc.
+      const oldLinkRegExp = createMarkdownImgLinkRegExp(
+        createStaticUrl(existingImage.fileName),
+        null,
+        'g',
+      );
+      const newLink = `![${updated.altText}](${createStaticUrl(updated.fileName)})`;
+      const updatedBody = blog.body.replaceAll(oldLinkRegExp, newLink);
+      await db.blog.update({
+        where: {
+          id: blog.id,
+        },
+        data: {
+          body: updatedBody,
+        },
+      });
+    }
 
     return res.json({
       status: 'success',
