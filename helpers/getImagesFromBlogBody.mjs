@@ -3,10 +3,10 @@ import db from '../db/prismaClient.mjs';
 
 export default async function getImagesFromBlogBody(body) {
   // Find all instances of a markdown string.
-  const imageLinks = body.match(regexp.createStaticLinkRegExp('g'));
+  const imageLinks = body.match(regexp.createMarkdownStaticLinkRegExp('g'));
 
   // Extract file names from imageLinks with another regexp.
-  const linkRegExp = regexp.createStaticFileNameRegExp();
+  const linkRegExp = regexp.createFileNameRegExp();
   const fileNames = imageLinks
     ? imageLinks.map((link) => link.match(linkRegExp)[0])
     : [];
