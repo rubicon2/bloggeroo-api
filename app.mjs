@@ -46,6 +46,16 @@ app.use((error, req, res, next) => {
   // Try to use this only as a last resort. Other more specific responses
   // (e.g. 400, 401, 403) should be provided by other routes.
   console.error(error);
+
+  // Handle multer file size error here since there seems to be no other place to catch it.
+  // Default message is just 'file too large', which isn't very useful for the user.
+  if (error.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({
+      status: 'error',
+      message: `File too large - maximum file size is ${process.env.UPLOAD_MAX_SIZE_MB}MB`,
+    });
+  }
+
   return res.status(500).json({
     status: 'error',
     message: error.message,

@@ -1,4 +1,5 @@
-function createStaticLinkRegExp(flags) {
+function createMarkdownStaticLinkRegExp(flags) {
+  // For finding markdown links to static directory on server as determined by env variables.
   return new RegExp(
     // String given to RegExp needs to be DOUBLE ESCAPED. The first \ gets consumed by string parser.
     // If eslint gives a no-useless-escape character, then it probably means you need another backslash!
@@ -7,8 +8,19 @@ function createStaticLinkRegExp(flags) {
   );
 }
 
-function createStaticFileNameRegExp(flags) {
+function createMarkdownImgLinkRegExp(link, altText, flags) {
+  // For matching ![my alt text](https://my-website.com/static/my-link.png), etc.
+  // Makes it easy to match and replace the whole link.
+  return new RegExp(`!\\[${altText || '.*?'}\\]\\(${link}\\)`, flags);
+}
+
+function createFileNameRegExp(flags) {
+  // For matching the filename at the end of a path.
   return new RegExp(`(?<=\\/)[^\\.\\/]+\\.\\w+`, flags);
 }
 
-export { createStaticLinkRegExp, createStaticFileNameRegExp };
+export {
+  createMarkdownStaticLinkRegExp,
+  createMarkdownImgLinkRegExp,
+  createFileNameRegExp,
+};
