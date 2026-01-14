@@ -11,4 +11,14 @@ function createStaticFileNameRegExp(flags) {
   return new RegExp(`(?<=\\/)[^\\.\\/]+\\.\\w+`, flags);
 }
 
-export { createStaticLinkRegExp, createStaticFileNameRegExp };
+function createMarkdownImgLinkRegExp(link, altText, flags) {
+  // For matching ![my alt text](https://my-website.com/static/my-link.png), etc.
+  // Makes it easy to match and replace the whole link.
+  return new RegExp(`!\\[${altText || '.*?'}\\]\\(${link}\\)`, flags);
+}
+
+export {
+  createStaticLinkRegExp,
+  createStaticFileNameRegExp,
+  createMarkdownImgLinkRegExp,
+};
