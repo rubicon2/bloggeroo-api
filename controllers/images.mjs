@@ -233,6 +233,24 @@ async function deleteImage(req, res, next) {
       });
     }
 
+    const blogs = await db.blog.findMany({
+      where: {
+        images: {
+          some: existingImage,
+        },
+      },
+    });
+
+    // If image is used in any blogs, abort deletion.
+    if (blogs.length > 0) {
+      return res.status(400).json({
+        status: 'fail',
+        data: {
+          message: `Cannot delete image while it is used in blogs: ${blogs.length} blogs use this image`,
+        },
+      });
+    }
+
     try {
       // If image exists, delete the file it points to.
       // If no file exists, this will throw an error.
