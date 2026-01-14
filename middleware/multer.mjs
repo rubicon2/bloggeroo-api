@@ -5,6 +5,8 @@ const allowedUploadMimeTypes = JSON.parse(
   process.env.UPLOAD_ALLOWED_MIME_TYPES,
 );
 
+const maxSizeBytes = process.env.UPLOAD_MAX_SIZE_MB * 1024 * 1024;
+
 const errorMsg = process.env.UPLOAD_MIME_TYPE_ERROR;
 
 const storage = multer.diskStorage({
@@ -33,4 +35,12 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-export default multer({ storage, fileFilter });
+const limits = {
+  fileSize: maxSizeBytes,
+};
+
+export default multer({
+  storage,
+  fileFilter,
+  limits,
+});
