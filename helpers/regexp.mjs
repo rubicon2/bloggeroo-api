@@ -8,9 +8,14 @@ function createMarkdownStaticLinkRegExp(flags) {
   return new RegExp(
     // String given to RegExp needs to be DOUBLE ESCAPED. The first \ gets consumed by string parser.
     // If eslint gives a no-useless-escape character, then it probably means you need another backslash!
-    `!\\[[^\\]]*\\]\\(${escapedUrl}\\/[^\\)]+\\)`,
+    `!\\[.*\\]\\(${escapedUrl}\\/.+?\\)`,
     flags,
   );
+}
+
+function createMarkdownUrlRegExp(flags) {
+  // Match the url within the ()!
+  return new RegExp(`(?<=\\().*(?=\\))`, flags);
 }
 
 function createMarkdownImgLinkRegExp(link, altText, flags) {
@@ -26,6 +31,7 @@ function createFileNameRegExp(flags) {
 
 export {
   createMarkdownStaticLinkRegExp,
+  createMarkdownUrlRegExp,
   createMarkdownImgLinkRegExp,
   createFileNameRegExp,
 };
