@@ -14,8 +14,9 @@ function createMarkdownStaticImageLinkRegExp(flags) {
 }
 
 function createMarkdownUrlRegExp(flags) {
-  // Match the url within the ()!
-  return new RegExp(`(?<=\\().*(?=\\))`, flags);
+  // Match the url within the ()! Markdown links can include names,
+  // like [Alt Text](http:url "Image Name"), so remember to exclude that too.
+  return new RegExp(`(?<=\\().+?(?=[" \\)])`, flags);
 }
 
 function createMarkdownImgLinkRegExp(link, altText, flags) {
