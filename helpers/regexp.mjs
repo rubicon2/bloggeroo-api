@@ -26,7 +26,7 @@ function createMarkdownImgLinkRegExp(link, altText, flags) {
 
 function createFileNameRegExp(flags) {
   // For matching the filename at the end of a path.
-  return new RegExp(`(?<=\\/)[^\\.\\/]+\\.\\w+`, flags);
+  return new RegExp(`(?<=\\/)[^\\.\\/]+\\.\\w+$`, flags);
 }
 
 export {
