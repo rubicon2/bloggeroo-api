@@ -2,13 +2,24 @@ import * as regexp from './regexp.mjs';
 import db from '../db/prismaClient.mjs';
 
 export default async function getImagesFromBlogBody(body) {
-  // Find all instances of a markdown string.
-  const imageLinks = body.match(regexp.createMarkdownStaticLinkRegExp('g'));
+  // Find all instances of a markdown image link that points to the static directory.
+  // Not interested in urls to external images, etc.
+  const markdownImageLinks = body.match(
+    regexp.createMarkdownStaticImageLinkRegExp('g'),
+  );
 
-  // Extract file names from imageLinks with another regexp.
+  // Extract http urls from markdown links.
+  const urlLinkRegExp = regexp.createMarkdownUrlRegExp('g');
+  const urlLinks = markdownImageLinks
+    ? markdownImageLinks.map(
+        (markdownImageLink) => markdownImageLink.match(urlLinkRegExp)[0],
+      )
+    : [];
+
+  // Extract file names from urls with another regexp.
   const linkRegExp = regexp.createFileNameRegExp();
-  const fileNames = imageLinks
-    ? imageLinks.map((link) => link.match(linkRegExp)[0])
+  const fileNames = urlLinks
+    ? urlLinks.map((link) => link.match(linkRegExp)[0])
     : [];
 
   // Find on database.
@@ -20,6 +31,5 @@ export default async function getImagesFromBlogBody(body) {
     },
   });
 
-  // Return database entries for those images.
   return images;
 }
