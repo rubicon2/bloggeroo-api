@@ -1,6 +1,6 @@
 import escapeStringRegexp from 'escape-string-regexp';
 
-function createMarkdownStaticLinkRegExp(flags) {
+function createMarkdownStaticImageLinkRegExp(flags) {
   const escapedUrl = escapeStringRegexp(
     process.env.SERVER_BASE_URL + process.env.SERVER_STATIC_DIR,
   );
@@ -30,7 +30,7 @@ function createFileNameRegExp(flags) {
 }
 
 export {
-  createMarkdownStaticLinkRegExp,
+  createMarkdownStaticImageLinkRegExp,
   createMarkdownUrlRegExp,
   createMarkdownImgLinkRegExp,
   createFileNameRegExp,

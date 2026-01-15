@@ -5,7 +5,7 @@ export default async function getImagesFromBlogBody(body) {
   // Find all instances of a markdown image link that points to the static directory.
   // Not interested in urls to external images, etc.
   const markdownImageLinks = body.match(
-    regexp.createMarkdownStaticLinkRegExp('g'),
+    regexp.createMarkdownStaticImageLinkRegExp('g'),
   );
 
   // Extract http urls from markdown links.
