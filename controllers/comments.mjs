@@ -1,6 +1,6 @@
 import db from '../db/prismaClient.mjs';
 import formatValidationErrors from '../helpers/formatValidationErrors.mjs';
-import { validationResult } from 'express-validator';
+import { validationResult, matchedData } from 'express-validator';
 
 // Should comments be nested within blogs or not?
 // On one hand, comments will always relate to particular blogs.
@@ -107,6 +107,10 @@ async function postComment(req, res, next) {
       return res.status(403).json({
         status: 'fail',
         data: {
+          message: result
+            .array()
+            .map((err) => err.msg)
+            .join('\n'),
           validationErrors: formatValidationErrors(result.array()),
         },
       });
@@ -115,9 +119,7 @@ async function postComment(req, res, next) {
     const comment = await db.comment.create({
       data: {
         ownerId: req.user.id,
-        blogId: req.query.blogId,
-        parentCommentId: req.query?.parentCommentId || null,
-        text: req.body.text,
+        ...matchedData(req),
       },
     });
 
