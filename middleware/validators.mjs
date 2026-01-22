@@ -98,6 +98,22 @@ function createCommentChain() {
         if (!blog) throw new Error('Blog does not exist');
       })
       .withMessage('Blog does not exist'),
+    query('parentCommentId')
+      .customSanitizer((value) => {
+        // If id is nullish, just return null.
+        if (!value || value === 'null') return null;
+        else return value;
+      })
+      .custom(async (id) => {
+        if (!id) return;
+        // If id is not nullish, check the parent comment exists.
+        const parentComment = await db.comment.findUnique({
+          where: {
+            id,
+          },
+        });
+        if (!parentComment) throw new Error('Parent comment does not exist');
+      }),
     body('text').notEmpty().withMessage('Comment requires text'),
   ];
 }
