@@ -16,6 +16,10 @@ function createMarkdownStaticImageLinkRegExp(flags) {
 function createMarkdownUrlRegExp(flags) {
   // Match the url within the ()! Markdown links can include names,
   // like [Alt Text](http:url "Image Name"), so remember to exclude that too.
+  // This will fail if [Alt Text (this gets picked up!)](http:url "Image Name") is
+  // given to it, since I can't figure out how to ignore the text in parantheses
+  // if it is encased in square brackets. Sounds simple, but negative lookahead/behind
+  // don't work as I expect.
   return new RegExp(`(?<=\\().+?(?=[" \\)])`, flags);
 }
 

@@ -11,9 +11,12 @@ export default async function getImagesFromBlogBody(body) {
   // Extract http urls from markdown links.
   const urlLinkRegExp = regexp.createMarkdownUrlRegExp('g');
   const urlLinks = markdownImageLinks
-    ? markdownImageLinks.map(
-        (markdownImageLink) => markdownImageLink.match(urlLinkRegExp)[0],
-      )
+    ? markdownImageLinks.map((markdownImageLink) => {
+        const matches = markdownImageLink.match(urlLinkRegExp);
+        // Return last match, so if user puts parantheses inside the square brackets,
+        // it grabs the link at the end instead of the [alt text (encased alt text)]!
+        if (matches) return matches[matches.length - 1];
+      })
     : [];
 
   // Extract file names from urls with another regexp.
